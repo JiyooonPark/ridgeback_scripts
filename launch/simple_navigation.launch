@@ -1,0 +1,10 @@
+<launch>
+    <include file="$(find ridgeback_gazebo)/launch/ridgeback_world.launch">
+    </include>
+
+    <include file="$(find ridgeback_navigation)/launch/odom_navigation_demo.launch">
+    </include>
+
+    <node pkg="ros_repo" type="simple_navigation" respawn="false" name="simple_navigation" output="screen"/>
+
+</launch>
