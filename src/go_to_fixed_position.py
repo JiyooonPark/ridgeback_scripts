@@ -8,10 +8,14 @@ from geometry_msgs.msg import Twist
 import math
 import time
 
+
+global x, y, w
 x = 0
 y = 0
-yaw = 0
+w = 0
 
+# def callback(msg):
+#     # print msg.pose.pose
 
 def get_current_position(msg):
     global x, y, w
@@ -22,44 +26,6 @@ def get_current_position(msg):
     # print('in function' ,  x, y, w)
     return x, y, w
 
-def go_to_goal(x_goal, y_goal):
-    global x
-    global y, yaw
-
-    velocity_message = Twist()
-    cmd_vel_topic='/cmd_vel'
-    velocity_publisher = rospy.Publisher(cmd_vel_topic, Twist, queue_size=10)
-    print ('start moving to ', x_goal, y_goal) 
-
-    i=0 
-    while (True):  
-        i = i+1
-        
-        K_linear = 0.5 
-        distance = abs(math.sqrt(((x_goal-x) ** 2) + ((y_goal-y) ** 2)))
-
-        linear_speed = distance * K_linear
-
-        K_angular = 4.0
-        desired_angle_goal = math.atan2(y_goal-y, x_goal-x)
-        angular_speed = (desired_angle_goal-yaw)*K_angular
-
-        velocity_message.linear.x = linear_speed
-        velocity_message.angular.z = angular_speed
-
-        velocity_publisher.publish(velocity_message)
-        # print ('x=', x, 'y=',y)
-        if i%3000 is 0:
-            print('distance', distance)
-            print(x, y)
-        else:
-            continue
-
-
-        if (distance <0.01):
-            print('done')
-            break
-
 def movebase_client(x_goal, y_goal):
     global x, y, w
     # rospy.init_node('check_odometry')
@@ -68,13 +34,13 @@ def movebase_client(x_goal, y_goal):
     
     # print( x, y, w)
     # print( x, y, w)
-    # while not rospy.is_shutdown():
-    #     print( x, y, w)
+    while not rospy.is_shutdown():
+        print( x, y, w)
 
     x_move = x_goal - x
     y_move = y_goal - y
 
-    print(x_move, y_move)
+    # print(x_move, y_move)
 
 
     client = actionlib.SimpleActionClient('move_base',MoveBaseAction)
@@ -95,26 +61,54 @@ def movebase_client(x_goal, y_goal):
     else:
         return client.get_result()
 
-if __name__ == '__main__':
-    # try:
-    #     rospy.init_node('move_to_fixed_pose')
-    #     odom_sub = rospy.Subscriber('/odom', Odometry, get_current_position)
-    #     rospy.sleep(0.5)
-    #     print(x, y,w)
-    #     result = movebase_client(0, 0)
-    #     if result:
-    #         rospy.loginfo("Goal execution done!")
-    #         odom_sub = rospy.Subscriber('/odom', Odometry, get_current_position)
-    #         rospy.sleep(0.5)
-    #         print(x, y,w)
-    # except rospy.ROSInterruptException:
-    #     rospy.loginfo("Navigation test finished.")
-    try:        
-        rospy.init_node('ridgeback_go_to_goal', anonymous=True)
-        listener = rospy.Subscriber('/odom', Odometry, get_current_position)
-        time.sleep(1.0)
-        go_to_goal(0,0)
+def go_to_goal(x_goal, y_goal):
+    global x
+    global y, w
 
-       
+    velocity_message = Twist()
+    cmd_vel_topic='/cmd_vel'
+    velocity_publisher = rospy.Publisher(cmd_vel_topic, Twist, queue_size=10)
+    print ('start moving to ', x_goal, y_goal) 
+
+    i=0 
+    while (True):  
+        i = i+1
+        
+        K_linear = 0.5 
+        distance = abs(math.sqrt(((x_goal-x) ** 2) + ((y_goal-y) ** 2)))
+
+        linear_speed = distance * K_linear
+
+        K_angular = 4.0
+        desired_angle_goal = math.atan2(y_goal-y, x_goal-x)
+        angular_speed = (desired_angle_goal-w)*K_angular
+
+        velocity_message.linear.x = linear_speed
+        velocity_message.angular.z = angular_speed
+
+        velocity_publisher.publish(velocity_message)
+        # print ('x=', x, 'y=',y)
+        if i%300 is 0:
+            print('distance', distance)
+        else:
+            continue
+
+
+        if (distance <0.01):
+            print('done')
+            break
+
+if __name__ == '__main__':
+    try:
+        rospy.init_node('move_to_fixed_pose')
+        odom_sub = rospy.Subscriber('/odom', Odometry, get_current_position)
+        rospy.sleep(0.5)
+        # print(x, y,w)
+        result = go_to_goal(0,0)
+        if result:
+            rospy.loginfo("Goal execution done!")
+            odom_sub = rospy.Subscriber('/odom', Odometry, get_current_position)
+            rospy.sleep(0.5)
+            print(x, y,w)
     except rospy.ROSInterruptException:
-        rospy.loginfo("node terminated.")
+        rospy.loginfo("Navigation test finished.")

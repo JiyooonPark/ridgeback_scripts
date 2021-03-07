@@ -6,7 +6,6 @@ from geometry_msgs.msg import Twist
 import math
 import time
 from std_srvs.srv import Empty
-from geometry_msgs.msg import PoseWithCovariance
 x = 0
 y = 0
 yaw = 0
@@ -91,7 +90,7 @@ def rotate (angular_speed_degree, relative_angle_degree, clockwise):
 
     angle_moved = 0.0
     loop_rate = rospy.Rate(10) # we publish the velocity at 10 Hz (10 times a second)    
-    cmd_vel_topic='/cmd_vel'
+    cmd_vel_topic='/cmd_vel_mux/input/teleop'
     velocity_publisher = rospy.Publisher(cmd_vel_topic, Twist, queue_size=10)
 
     t0 = rospy.Time.now().to_sec()
@@ -121,19 +120,9 @@ def go_to_goal(x_goal, y_goal):
     velocity_message = Twist()
     cmd_vel_topic='/cmd_vel'
     velocity_publisher = rospy.Publisher(cmd_vel_topic, Twist, queue_size=10)
-    print ( 'at : ', x, y)
     print ('start moving to ', x_goal, y_goal) 
 
     i=0 
-
-    # K_angular = 4.0
-    # desired_angle_goal = math.atan2(y_goal-y, x_goal-x)
-    # angular_speed = (desired_angle_goal-yaw)*K_angular
-    # velocity_message.angular.z = angular_speed
-    # rotate(angular_speed, desired_angle_goal, True)
-    # rospy.sleep(3)
-    print( 'rotation done')
-    
     while (True):  
         i = i+1
         
@@ -142,17 +131,17 @@ def go_to_goal(x_goal, y_goal):
 
         linear_speed = distance * K_linear
 
+        K_angular = 4.0
+        desired_angle_goal = math.atan2(y_goal-y, x_goal-x)
+        angular_speed = (desired_angle_goal-yaw)*K_angular
+
         velocity_message.linear.x = linear_speed
-        velocity_message.angular.z = 0
-        # velocity_message.angular.z = angular_speed
+        velocity_message.angular.z = angular_speed
 
         velocity_publisher.publish(velocity_message)
-
-
         # print ('x=', x, 'y=',y)
-        if i%3000 is 0:
+        if i%300 is 0:
             print('distance', distance)
-            
         else:
             continue
 
@@ -161,23 +150,17 @@ def go_to_goal(x_goal, y_goal):
             print('done')
             break
 
-def change_orientation():
-    odom_topic='/odom'
-    odom_publisher = rospy.Publisher(odom_topic, Odometry, queue_size=10)
 
-    odom_message = Odometry()
-    odom_message.pose.pose.position.x = 10
-    odom_message.pose.pose.position.y = 20
-    odom_publisher.publish(odom_message)
 
 if __name__ == '__main__':
-    try:        
+    try:
+        
+        
         rospy.init_node('turtlesim_motion_pose', anonymous=True)
         listener = rospy.Subscriber('/odom', Odometry, print_pose)
         # move (0.2, 1 , True)
         time.sleep(1.0)
         go_to_goal(2,3)
-        # change_orientation()
         # rotate (90, 90 , True)
 
        
