@@ -12,6 +12,10 @@ import roslib; roslib.load_manifest('teleop_twist_keyboard')
 import rospy
 from geometry_msgs.msg import Twist, PoseWithCovarianceStamped
 import sys, select, termios, tty
+from tf.transformations import euler_from_quaternion, quaternion_from_euler
+import math
+angle=0
+kp=0.5
 
 global x_pose, y_pose, w_pose, z_pose 
 x_pose = 0
@@ -29,10 +33,12 @@ y_goal = 2
 global x_diff, y_diff
 x_diff = 0
 y_diff = 0
-# def callback(msg):
-#     # print msg.pose.pose
+
+count = 0
 
 def get_current_position(msg):
+    global count
+    count = count +1
     global x_pose, y_pose, w_pose, z_pose
     global x_goal, y_goal
     global x_diff, y_diff
@@ -51,10 +57,25 @@ def get_current_position(msg):
     # I want this diffs to be used in the convestional x, y axis
     print ("x_diff : ", x_diff, "y_diff : ", y_diff)
 
+    # to fix problem 
+    global angle
+
+    orientation_q = msg.pose.pose.orientation
+    orientation_list = [orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w]
+    (roll, pitch, yaw) = euler_from_quaternion (orientation_list)
+    angle = yaw *180 / math.pi
+    if angle < 0:
+        angle = angle + 360
+    else:
+        pass
+    print("angle is: ",angle)
+
+
+
 class PublishThread(threading.Thread):
     def __init__(self, rate):
-        super(PublishThread, self).__init__()
         self.publisher = rospy.Publisher('cmd_vel', Twist, queue_size = 1)
+        super(PublishThread, self).__init__()
         self.x = 0.0
         self.y = 0.0
         self.z = 0.0
@@ -102,6 +123,7 @@ class PublishThread(threading.Thread):
         self.done = True
         self.update(0, 0, 0, 0, 0, 0)
         self.join()
+
     def run(self):
         twist = Twist()
         while not self.done:
@@ -171,16 +193,21 @@ if __name__=="__main__":
         pub_thread.update(x_vel, y_vel, z, th, speed, turn)
        
         while(goal_difference()):
-            x_vel = x_diff / (abs(x_diff) + abs(y_diff))
-            y_vel = y_diff / (abs(x_diff) + abs(y_diff))
+
+            a = math.sqrt((x_goal**2 + y_goal**2) / (1 + (y_goal/x_goal - math.tan(angle))**2))
+            b = ((x_goal/y_goal)-math.tan(angle))*a
+            x_vel = a / (abs(a) + abs(b))
+            y_vel = b / (abs(a) + abs(b))
+            
+
             z = 0
             th = 0 
-            if i%5000 is 0:
+            if i%100000 is 0:
+                print ("a: ", a, "b: ", b)
                 print (x_vel, y_vel)
             else:
                 j=0
             i = i+1
-            pub_thread.update(x_vel, y_vel, z, th, speed, turn)
             # print ("updated")
         pub_thread.stop()
 
