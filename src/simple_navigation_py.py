@@ -9,7 +9,7 @@ def callback(msg):
     print msg.pose.pose
 
 
-def movebase_client():
+def movebase_client(goal_x, goal_y):
     # rospy.init_node('check_odometry')
     # odom_sub = rospy.Subscriber('/odom', Odometry, callback)
     # rospy.spin()
@@ -20,8 +20,8 @@ def movebase_client():
     goal = MoveBaseGoal()
     goal.target_pose.header.frame_id = "map"
     goal.target_pose.header.stamp = rospy.Time.now()
-    goal.target_pose.pose.position.x = 3
-    goal.target_pose.pose.position.y = 2
+    goal.target_pose.pose.position.x = goal_x
+    goal.target_pose.pose.position.y = goal_y
     goal.target_pose.pose.orientation.w = 1.0
 
     client.send_goal(goal)
@@ -35,7 +35,7 @@ def movebase_client():
 if __name__ == '__main__':
     try:
         rospy.init_node('movebase_client_py')
-        result = movebase_client()
+        result = movebase_client(3, 2)
         if result:
             rospy.loginfo("Goal execution done!")
     except rospy.ROSInterruptException:

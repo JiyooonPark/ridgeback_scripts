@@ -20,11 +20,11 @@ w_pose = 0
 z_pose = 0
 
 global x_goal, y_goal
-# x_goal = 0
-# y_goal = 0
+x_goal = 0
+y_goal = 0
 
-x_goal = 2
-y_goal = 2
+# x_goal = 2
+# y_goal = 2
 
 global x_diff, y_diff
 x_diff = 0
@@ -141,12 +141,13 @@ def goal_difference():
     else:
         return True
 
-if __name__=="__main__":
-    # global x_goal, y_goal, x_diff, y_diff
+def go_to_goal_holonomic(in_x_goal, in_y_goal):
+    global x_goal, y_goal, x_diff, y_diff
+
+    x_goal = in_x_goal
+    y_goal = in_y_goal
 
     settings = termios.tcgetattr(sys.stdin)
-
-    rospy.init_node('holonimoic_move_to_goal')
 
     speed = rospy.get_param("~speed", 0.5)
     turn = rospy.get_param("~turn", 1.0)
@@ -191,3 +192,8 @@ if __name__=="__main__":
         pub_thread.stop()
 
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+if __name__=="__main__":
+    
+    rospy.init_node('holonimoic_move_to_goal')
+
+    go_to_goal_holonomic(-2, -2)
