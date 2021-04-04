@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # integration
-from go_to_goal import movebase_client
+from go_to_goal_simple import movebase_client
 from go_to_goal_holonomic import go_to_goal_holonomic
 import rospy
 

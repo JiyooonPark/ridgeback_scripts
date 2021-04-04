@@ -1,83 +1,16 @@
+
 #!/usr/bin/env python
-
-# goal_to_goal_cmd_vel.py
-# uses cmd_vel topic to publish velocity
-# it takes in a goal position and re evaluates its velocity everytime amcl_pose is updated
-# tip :  do not erase the run function even if it seems useless... it won't work if you delete it. 
-# used teleop_twist_keyboard.py code for reference. 
-
 from __future__ import print_function
 import threading
 import roslib; roslib.load_manifest('teleop_twist_keyboard')
 import rospy
 from geometry_msgs.msg import Twist, PoseWithCovarianceStamped
 import sys, select, termios, tty
-from tf.transformations import euler_from_quaternion, quaternion_from_euler
-import math
-import numpy as np
-
-angle=0
-kp=0.5
-
-global x_pose, y_pose, w_pose, z_pose 
-x_pose = 0
-y_pose = 0
-w_pose = 0
-z_pose = 0
-
-global x_goal, y_goal
-# x_goal = 0
-# y_goal = 0
-
-x_goal = 2
-y_goal = 2
-
-global x_diff, y_diff
-x_diff = 0
-y_diff = 0
-# def callback(msg):
-#     # print msg.pose.pose
 
 def get_current_position(msg):
-    global x_pose, y_pose, w_pose, z_pose
-    global x_goal, y_goal
-    global x_diff, y_diff
-
     # follows the conventional x, y, poses
-    x_pose = msg.pose.pose.position.x
     y_pose = msg.pose.pose.position.y
     w_pose = msg.pose.pose.orientation.w
-    z_pose = msg.pose.pose.orientation.z
-    print("x:", x_pose, "y:", y_pose , "w:", w_pose)
-
-    
-
-    # to fix problem 
-    global angle
-
-    orientation_q = msg.pose.pose.orientation
-    orientation_list = [orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w]
-    (roll, pitch, yaw) = euler_from_quaternion (orientation_list)
-    angle = yaw *180 / math.pi
-    if angle < 0:
-        angle = angle
-    else:
-        pass
-    print(angle)
-
-        
-    # follows the conventional x, y, poses
-    x_diff = x_goal - x_pose
-    y_diff = y_goal - y_pose
-    a = np.array([[math.cos(angle), math.sin(angle)],[math.sin(angle), math.cos(angle)]])
-    print(a)
-    # x_diff_ad, y_diff_ad = np.matmul(a, [x_goal, y_goal])
-    K = np.matmul(a, [x_goal, y_goal])
-    print(K)
-
-    # I want this diffs to be used in the convestional x, y axis
-    print ("x_diff : ", x_diff, "y_diff : ", y_diff)
-
 
 class PublishThread(threading.Thread):
     def __init__(self, rate):
@@ -160,21 +93,9 @@ class PublishThread(threading.Thread):
         self.publisher.publish(twist)
 
 
-
-def goal_difference():
-    global x_diff, y_diff
-    if abs(x_diff) < 0.05 and abs(y_diff) <0.05:
-        print ("reached goal")
-        return False
-    else:
-        return True
-
-if __name__=="__main__":
-    # global x_goal, y_goal, x_diff, y_diff
+def go_to_goal_holonomic(in_x_goal, in_y_goal):
 
     settings = termios.tcgetattr(sys.stdin)
-
-    rospy.init_node('holonimoic_move_to_goal')
 
     speed = rospy.get_param("~speed", 0.5)
     turn = rospy.get_param("~turn", 1.0)
@@ -186,40 +107,14 @@ if __name__=="__main__":
 
     odom_sub = rospy.Subscriber('/amcl_pose', PoseWithCovarianceStamped, get_current_position)
 
-    x_vel = 0
-    y_vel = 0
-    z = 0
-    th = 0
-    status = 0
-    speed = 0.35
-    i=0
 
     try:
         pub_thread.wait_for_subscribers()
         pub_thread.update(x_vel, y_vel, z, th, speed, turn)
        
         while(goal_difference()):
-            x_vel = x_diff / (abs(x_diff) + abs(y_diff))
-            y_vel = y_diff / (abs(x_diff) + abs(y_diff))
-
-            # a = math.sqrt((x_goal**2 + y_goal**2) / (1 + (y_goal/x_goal - math.tan(angle))**2))
-            # b = ((x_goal/y_goal)-math.tan(angle))*a
-            # x_vel = a / (abs(a) + abs(b))
-            # y_vel = b / (abs(a) + abs(b))
-            
-
-            z = 0
-            th = 0 
-            if i%100000 is 0:
-                # print ("a: ", a, "b: ", b)
-                print (x_vel, y_vel)
-            else:
-                pass
-            i = i+1
             pub_thread.update(x_vel, y_vel, z, th, speed, turn)
-            # print ("updated")
         pub_thread.stop()
-
     except Exception as e:
         print(e)
 
@@ -227,3 +122,8 @@ if __name__=="__main__":
         pub_thread.stop()
 
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+if __name__=="__main__":
+    
+    rospy.init_node('holonimoic_move_to_goal')
+
+    go_to_goal_holonomic(-2, -2)
