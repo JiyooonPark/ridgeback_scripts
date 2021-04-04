@@ -1,0 +1,131 @@
+
+Type: dynamic_reconfigure/Config
+
+Publishers: 
+ * /move_base (http://jypark-HANSUNG:45013/)
+
+Subscribers: 
+ * /rqt_gui_py_node_5213 (http://jypark-HANSUNG:41851/)
+ * /rostopic_6828_1617498952329 (http://jypark-HANSUNG:42435/)
+
+
+
+
+
+rostopic echo /move_base/DWAPlannerROS/parameter_updates
+bools: 
+  - 
+    name: "prune_plan"
+    value: False
+  - 
+    name: "use_dwa"
+    value: True
+  - 
+    name: "restore_defaults"
+    value: False
+ints: 
+  - 
+    name: "vx_samples"
+    value: 3
+  - 
+    name: "vy_samples"
+    value: 10
+  - 
+    name: "vth_samples"
+    value: 20
+strs: []
+doubles: 
+  - 0
+    name: "max_vel_trans"
+    value: 0.55
+  - 1
+    name: "min_vel_trans"
+    value: 0.1
+  - 2
+    name: "max_vel_x"
+    value: 0.55
+  - 3
+    name: "min_vel_x"
+    value: 0.0
+  - 4
+    name: "max_vel_y"
+    value: 0.1
+  - 5
+    name: "min_vel_y"
+    value: -0.1
+  - 6
+    name: "max_vel_theta"
+    value: 0.2
+  - 7
+    name: "min_vel_theta"
+    value: 0.1
+  - 8
+    name: "acc_lim_x"
+    value: 2.5
+  - 9
+    name: "acc_lim_y"
+    value: 2.5
+  - 10
+    name: "acc_lim_theta"
+    value: 3.2
+  - 
+    name: "acc_lim_trans"
+    value: 0.1
+  - 12
+    name: "xy_goal_tolerance"
+    value: 0.1
+  - 
+    name: "yaw_goal_tolerance"
+    value: 0.01
+  - 14
+    name: "trans_stopped_vel"
+    value: 0.1
+  - 
+    name: "theta_stopped_vel"
+    value: 0.1
+  - 16
+    name: "sim_time"
+    value: 1.7
+  - 
+    name: "sim_granularity"
+    value: 0.025
+  - 18
+    name: "angular_sim_granularity"
+    value: 0.1
+  - 
+    name: "path_distance_bias"
+    value: 0.6
+  - 20
+    name: "goal_distance_bias"
+    value: 0.8
+  - 
+    name: "occdist_scale"
+    value: 0.01
+  - 22
+    name: "twirling_scale"
+    value: 0.0
+  - 
+    name: "stop_time_buffer"
+    value: 0.2
+  - 24
+    name: "oscillation_reset_dist"
+    value: 0.05
+  - 
+    name: "oscillation_reset_angle"
+    value: 0.2
+  - 26
+    name: "forward_point_distance"
+    value: 0.325
+  - 
+    name: "scaling_speed"
+    value: 0.25
+  - 28
+    name: "max_scaling_factor"
+    value: 0.2
+groups: 
+  - 
+    name: "Default"
+    state: True
+    id: 0
+    parent: 0
+---
