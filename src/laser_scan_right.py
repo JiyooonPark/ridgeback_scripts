@@ -30,8 +30,6 @@ def turn_right(z, sec):
     cmd.angular.y = 0
     cmd.angular.z = -z
     rospy.sleep(1)
-    # z_init=z
-    # print("init z: {:.3f}".format(  to_angle(z_init)))
     seconds = time.time()
     while time.time() - seconds <sec:
         publisher.publish(cmd)
@@ -43,25 +41,25 @@ def turn_left(z, sec):
     cmd.angular.y = 0
     cmd.angular.z = z
     rospy.sleep(1)
-    # z_init=z
-    # print("init z: {:.3f}".format(  to_angle(z_init)))
     seconds = time.time()
     while time.time() - seconds <sec:
         publisher.publish(cmd)
+
 def diff(angle1, angle2):
     print("difference of : {:.4} and {:.4} is {:.4}".format(angle1, angle2, angle1-angle2))
     return angle1-angle2
+
 def right_angle():
     rospy.sleep(1)
-    
     while True:
-        if diff(angle_120*m, angle_90) >0.01:
-            turn_right(0.05, 0.1)
-        elif diff(angle_120*m, angle_90) <-0.01:
-            turn_left(0.05, 0.1)
+        if angle_120 - angle_60 >0.007:
+            turn_right(0.025, 0.05)
+        elif angle_120 - angle_60 <-0.007:
+            turn_left(0.025, 0.05)
         # elif diff(angle_60*m, angle_90) >1:
         #     turn_left(0.1, 0.1)
         else:
+            print(angle_60, angle_120, angle_120-angle_60)
             print("done?")
             break
 
@@ -69,4 +67,4 @@ if __name__=="__main__":
     rospy.init_node('scan_values')
     sub = rospy.Subscriber('/front/scan', LaserScan, callback_laser)
     right_angle()
-    rospy.spin()
+    # rospy.spin()
