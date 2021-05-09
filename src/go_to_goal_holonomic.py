@@ -195,4 +195,4 @@ if __name__=="__main__":
     
     rospy.init_node('holonimoic_move_to_goal')
 
-    go_to_goal_holonomic(-2, -2)
+    go_to_goal_holonomic(2, -2)

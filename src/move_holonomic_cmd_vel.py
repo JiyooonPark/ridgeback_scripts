@@ -1,23 +1,24 @@
-#!/usr/bin/env python3
-
+#!/usr/bin/env python
+import tf
 import rospy
 from geometry_msgs.msg import Twist, PoseWithCovarianceStamped
-import time
-
+from nav_msgs.msg import Odometry
+import time, math
 x=0
 y=0
-def get_current_position(msg):
+def callback(msg):
     # follows the conventional x, y, poses
     global x, y
     x = msg.pose.pose.position.x
     y = msg.pose.pose.position.y
-    # print(x, y)
+    print(x, y)
 
 def publish_cmd_vel():
     publisher = rospy.Publisher('cmd_vel', Twist, queue_size = 1)
     cmd = Twist()
-    cmd.linear.x = 0.05
-    cmd.linear.y = 0
+    # always set to 0.05 for optimal result
+    cmd.linear.x = 0
+    cmd.linear.y = -0.05
     cmd.linear.z = 0
     rospy.sleep(1)
     x_init = x
@@ -34,6 +35,5 @@ def publish_cmd_vel():
 if __name__=="__main__":
     
     rospy.init_node('holonimoic_move_to_goal')
-    odom_sub = rospy.Subscriber('/amcl_pose', PoseWithCovarianceStamped, get_current_position)
-    # go_to_goal_holonomic(2, -2)
+    odom_sub = rospy.Subscriber('/odom', Odometry, callback)
     publish_cmd_vel()
