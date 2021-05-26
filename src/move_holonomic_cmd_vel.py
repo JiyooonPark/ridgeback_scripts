@@ -14,18 +14,21 @@ def callback(msg):
     print(x, y)
 
 def publish_cmd_vel():
+    goal = 0.6
+    speed = 0.01
     publisher = rospy.Publisher('cmd_vel', Twist, queue_size = 1)
     cmd = Twist()
     # always set to 0.05 for optimal result
     cmd.linear.x = 0
-    cmd.linear.y = -0.05
+    # - y: right  
+    cmd.linear.y = -speed
     cmd.linear.z = 0
     rospy.sleep(1)
     x_init = x
     y_init = y
     print("init x: {:.3f} y: {:.3f}".format( x_init,y_init))
     seconds = time.time()
-    while time.time() - seconds <10:
+    while time.time() - seconds <goal/speed:
         publisher.publish(cmd)
     x_final = x
     y_final = y

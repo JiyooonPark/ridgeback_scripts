@@ -15,9 +15,9 @@ def callback_laser(msg):
     # print ("90:{:.4}".format(msg.ranges[360]))
     # print ("180:{:.4}".format(msg.ranges[719]))
     # print()
-    angle_60 = msg.ranges[240]
-    angle_90 = msg.ranges[360]
-    angle_120 = msg.ranges[480]
+    angle_60 = (msg.ranges[490]+msg.ranges[500]+msg.ranges[510])/3
+    angle_90 = (msg.ranges[530]+msg.ranges[540]+msg.ranges[550])/3
+    angle_120 = (msg.ranges[570]+msg.ranges[580]+msg.ranges[590])/3
     m = math.sqrt(3)/2
 
     # print("{:.4} {:.4} {:.4}".format(angle_120, angle_90, angle_60))
@@ -50,11 +50,12 @@ def diff(angle1, angle2):
     return angle1-angle2
 
 def right_angle():
+    thresh = 0.005
     rospy.sleep(1)
     while True:
-        if angle_120 - angle_60 >0.007:
+        if angle_120 - angle_60 >thresh:
             turn_right(0.025, 0.05)
-        elif angle_120 - angle_60 <-0.007:
+        elif angle_120 - angle_60 <-thresh:
             turn_left(0.025, 0.05)
         # elif diff(angle_60*m, angle_90) >1:
         #     turn_left(0.1, 0.1)

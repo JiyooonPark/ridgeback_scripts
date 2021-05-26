@@ -18,7 +18,7 @@ def publish_cmd_vel():
     cmd = Twist()
     # always set to 0.05 for optimal result
     cmd.linear.x = 0
-    cmd.linear.y = -0.05
+    cmd.linear.y = 0.05
     cmd.linear.z = 0
     rospy.sleep(1)
     x_init = x
