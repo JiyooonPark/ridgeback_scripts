@@ -5,7 +5,7 @@ from nav_msgs.msg import Odometry
 i = 0
 
 
-def callback(msg):
+def callback_odom(msg):
     global i
 
     # rospy.sleep(5)
@@ -18,6 +18,6 @@ def callback(msg):
 
 
 rospy.init_node('check_odometry_odom')
-odom_sub = rospy.Subscriber('/odom', Odometry, callback)
+odom_sub = rospy.Subscriber('/odom', Odometry, callback_odom)
 
 rospy.spin()

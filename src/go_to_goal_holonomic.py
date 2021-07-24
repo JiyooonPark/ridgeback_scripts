@@ -3,17 +3,21 @@
 # goal_to_goal_holonomic.py
 # uses cmd_vel topic to publish velocity
 # it takes in a goal position and re evaluates its velocity everytime amcl_pose is updated
-# tip :  do not erase the run function even if it seems useless... it won't work if you delete it. 
-# used teleop_twist_keyboard.py code for reference. 
+# tip :  do not erase the run function even if it seems useless... it won't work if you delete it.
+# used teleop_twist_keyboard.py code for reference.
 
 from __future__ import print_function
-import threading
-import roslib; roslib.load_manifest('teleop_twist_keyboard')
-import rospy
+import tty
+import termios
+import select
+import sys
 from geometry_msgs.msg import Twist, PoseWithCovarianceStamped
-import sys, select, termios, tty
+import rospy
+import threading
+import roslib
+roslib.load_manifest('teleop_twist_keyboard')
 
-global x_pose, y_pose, w_pose, z_pose 
+global x_pose, y_pose, w_pose, z_pose
 x_pose = 0
 y_pose = 0
 w_pose = 0
@@ -32,6 +36,7 @@ y_diff = 0
 # def callback(msg):
 #     # print msg.pose.pose
 
+
 def get_current_position(msg):
     global x_pose, y_pose, w_pose, z_pose
     global x_goal, y_goal
@@ -43,7 +48,7 @@ def get_current_position(msg):
     w_pose = msg.pose.pose.orientation.w
     z_pose = msg.pose.pose.orientation.z
     # print("x:", x_pose, "y:", y_pose , "w:", w_pose)
-    
+
     # follows the conventional x, y, poses
     x_diff = x_goal - x_pose
     y_diff = y_goal - y_pose
@@ -51,10 +56,11 @@ def get_current_position(msg):
     # I want this diffs to be used in the convestional x, y axis
     # print ("x_diff : ", x_diff, "y_diff : ", y_diff)
 
+
 class PublishThread(threading.Thread):
     def __init__(self, rate):
         super(PublishThread, self).__init__()
-        self.publisher = rospy.Publisher('cmd_vel', Twist, queue_size = 1)
+        self.publisher = rospy.Publisher('cmd_vel', Twist, queue_size=1)
         self.x = 0.0
         self.y = 0.0
         self.z = 0.0
@@ -77,12 +83,14 @@ class PublishThread(threading.Thread):
         i = 0
         while not rospy.is_shutdown() and self.publisher.get_num_connections() == 0:
             if i == 4:
-                print("Waiting for subscriber to connect to {}".format(self.publisher.name))
+                print("Waiting for subscriber to connect to {}".format(
+                    self.publisher.name))
             rospy.sleep(0.5)
             i += 1
             i = i % 5
         if rospy.is_shutdown():
-            raise Exception("Got shutdown request before subscribers connected")
+            raise Exception(
+                "Got shutdown request before subscribers connected")
 
     def update(self, x, y, z, th, speed, turn):
 
@@ -102,6 +110,7 @@ class PublishThread(threading.Thread):
         self.done = True
         self.update(0, 0, 0, 0, 0, 0)
         self.join()
+
     def run(self):
         twist = Twist()
         while not self.done:
@@ -134,11 +143,12 @@ class PublishThread(threading.Thread):
 
 def goal_difference():
     global x_diff, y_diff
-    if abs(x_diff) < 0.05 and abs(y_diff) <0.05:
-        print ("reached goal")
+    if abs(x_diff) < 0.05 and abs(y_diff) < 0.05:
+        print("reached goal")
         return False
     else:
         return True
+
 
 def go_to_goal_holonomic(in_x_goal, in_y_goal):
     global x_goal, y_goal, x_diff, y_diff
@@ -156,7 +166,8 @@ def go_to_goal_holonomic(in_x_goal, in_y_goal):
     if key_timeout == 0.0:
         key_timeout = None
 
-    odom_sub = rospy.Subscriber('/amcl_pose', PoseWithCovarianceStamped, get_current_position)
+    odom_sub = rospy.Subscriber(
+        '/amcl_pose', PoseWithCovarianceStamped, get_current_position)
 
     x_vel = 0
     y_vel = 0
@@ -164,19 +175,19 @@ def go_to_goal_holonomic(in_x_goal, in_y_goal):
     th = 0
     status = 0
     speed = 0.35
-    i=0
+    i = 0
 
     try:
         pub_thread.wait_for_subscribers()
         pub_thread.update(x_vel, y_vel, z, th, speed, turn)
-       
+
         while(goal_difference()):
             x_vel = x_diff / (abs(x_diff) + abs(y_diff))
             y_vel = y_diff / (abs(x_diff) + abs(y_diff))
             z = 0
-            th = 0 
+            th = 0
             # if i%5000 is 0:
-                # print (x_vel, y_vel)
+            # print (x_vel, y_vel)
             # else:
             #     j=0
             i = i+1
@@ -191,8 +202,10 @@ def go_to_goal_holonomic(in_x_goal, in_y_goal):
         pub_thread.stop()
 
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
-if __name__=="__main__":
-    
+
+
+if __name__ == "__main__":
+
     rospy.init_node('holonimoic_move_to_goal')
 
     go_to_goal_holonomic(2, -2)

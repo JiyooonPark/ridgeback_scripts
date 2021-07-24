@@ -6,11 +6,12 @@ import rospy
 from geometry_msgs.msg import Twist
 import math
 import time
-from turtlesim.msg import Pose 
+from turtlesim.msg import Pose
 from std_srvs.srv import Empty
 x = 0
 y = 0
 yaw = 0
+
 
 def print_pose(msg):
     global x, y, yaw
@@ -21,72 +22,73 @@ def print_pose(msg):
 
 
 def move(speed, distance, is_forward):
-        #declare a Twist message to send velocity commands
-        velocity_message = Twist()
-        #get current location 
-
-
-        if (speed > 0.4):
-            print ('speed must be lower than 0.4')
-            return
-
-        if (is_forward):
-            velocity_message.linear.x =abs(speed)
-        else:
-        	velocity_message.linear.x =-abs(speed)
-
-        distance_moved = 0.0
-        loop_rate = rospy.Rate(10) # we publish the velocity at 10 Hz (10 times a second)    
-        cmd_vel_topic='/cmd_vel_mux/input/teleop'
-        cmd_vel_topic='/turtle1/cmd_vel'
-        velocity_publisher = rospy.Publisher(cmd_vel_topic, Twist, queue_size=10)
-
-        t0 = rospy.Time.now().to_sec()
-
-        while True :
-                rospy.loginfo("Turtlesim moves forwards")
-                velocity_publisher.publish(velocity_message)
-
-                loop_rate.sleep()
-                t1 =  rospy.Time.now().to_sec()
-                #rospy.Duration(1.0)
-                
-                distance_moved = (t1-t0) * speed
-                print (distance_moved)               
-                if not (distance_moved < distance):
-                    rospy.loginfo("reached")
-                    break
-        
-        #finally, stop the robot when the distance is moved
-        velocity_message.linear.x =0
-        velocity_publisher.publish(velocity_message)
-    
-def rotate (angular_speed_degree, relative_angle_degree, clockwise):
-    
-
+    # declare a Twist message to send velocity commands
     velocity_message = Twist()
-    velocity_message.linear.x=0
-    velocity_message.linear.y=0
-    velocity_message.linear.z=0
-    velocity_message.angular.x=0
-    velocity_message.angular.y=0
-    velocity_message.angular.z=0
+    # get current location
 
-    angular_speed=math.radians(abs(angular_speed_degree))
+    if (speed > 0.4):
+        print('speed must be lower than 0.4')
+        return
 
-    if (clockwise):
-        velocity_message.angular.z =-abs(angular_speed)
+    if (is_forward):
+        velocity_message.linear.x = abs(speed)
     else:
-        velocity_message.angular.z =abs(angular_speed)
+        velocity_message.linear.x = -abs(speed)
 
-    angle_moved = 0.0
-    loop_rate = rospy.Rate(10) # we publish the velocity at 10 Hz (10 times a second)    
-    cmd_vel_topic='/cmd_vel_mux/input/teleop'
+    distance_moved = 0.0
+    # we publish the velocity at 10 Hz (10 times a second)
+    loop_rate = rospy.Rate(10)
+    cmd_vel_topic = '/cmd_vel_mux/input/teleop'
+    cmd_vel_topic = '/turtle1/cmd_vel'
     velocity_publisher = rospy.Publisher(cmd_vel_topic, Twist, queue_size=10)
 
     t0 = rospy.Time.now().to_sec()
 
-    while True :
+    while True:
+        rospy.loginfo("Turtlesim moves forwards")
+        velocity_publisher.publish(velocity_message)
+
+        loop_rate.sleep()
+        t1 = rospy.Time.now().to_sec()
+        # rospy.Duration(1.0)
+
+        distance_moved = (t1-t0) * speed
+        print(distance_moved)
+        if not (distance_moved < distance):
+            rospy.loginfo("reached")
+            break
+
+    # finally, stop the robot when the distance is moved
+    velocity_message.linear.x = 0
+    velocity_publisher.publish(velocity_message)
+
+
+def rotate(angular_speed_degree, relative_angle_degree, clockwise):
+
+    velocity_message = Twist()
+    velocity_message.linear.x = 0
+    velocity_message.linear.y = 0
+    velocity_message.linear.z = 0
+    velocity_message.angular.x = 0
+    velocity_message.angular.y = 0
+    velocity_message.angular.z = 0
+
+    angular_speed = math.radians(abs(angular_speed_degree))
+
+    if (clockwise):
+        velocity_message.angular.z = -abs(angular_speed)
+    else:
+        velocity_message.angular.z = abs(angular_speed)
+
+    angle_moved = 0.0
+    # we publish the velocity at 10 Hz (10 times a second)
+    loop_rate = rospy.Rate(10)
+    cmd_vel_topic = '/cmd_vel_mux/input/teleop'
+    velocity_publisher = rospy.Publisher(cmd_vel_topic, Twist, queue_size=10)
+
+    t0 = rospy.Time.now().to_sec()
+
+    while True:
         rospy.loginfo("Turtlesim rotates")
         velocity_publisher.publish(velocity_message)
 
@@ -94,14 +96,14 @@ def rotate (angular_speed_degree, relative_angle_degree, clockwise):
         current_angle_degree = (t1-t0)*angular_speed_degree
         loop_rate.sleep()
 
-        print ('current_angle_degree: ',current_angle_degree)
-                       
-        if  (current_angle_degree>relative_angle_degree):
+        print('current_angle_degree: ', current_angle_degree)
+
+        if (current_angle_degree > relative_angle_degree):
             rospy.loginfo("reached")
             break
 
-    #finally, stop the robot when the distance is moved
-    velocity_message.angular.z =0
+    # finally, stop the robot when the distance is moved
+    velocity_message.angular.z = 0
     velocity_publisher.publish(velocity_message)
 
 
@@ -110,12 +112,12 @@ def go_to_goal(x_goal, y_goal):
     global y, z, yaw
 
     velocity_message = Twist()
-    cmd_vel_topic='/turtle1/cmd_vel'
+    cmd_vel_topic = '/turtle1/cmd_vel'
     velocity_publisher = rospy.Publisher(cmd_vel_topic, Twist, queue_size=10)
     # velocity_message.angular.z = angular_speed
-    
+
     while (True):
-        K_linear = 0.5 
+        K_linear = 0.5
         distance = abs(math.sqrt(((x_goal-x) ** 2) + ((y_goal-y) ** 2)))
 
         linear_speed = distance * K_linear
@@ -130,21 +132,19 @@ def go_to_goal(x_goal, y_goal):
         velocity_publisher.publish(velocity_message)
         # print ('x=', x, 'y=',y)
 
-
-        if (distance <0.01):
+        if (distance < 0.01):
             break
-
 
 
 if __name__ == '__main__':
     try:
-        
+
         rospy.init_node('turtlesim_motion_pose', anonymous=True)
         listener = rospy.Subscriber('/turtle1/pose', Pose, print_pose)
         # move (0.05, 1 , False)
-        go_to_goal(3,3)
+        go_to_goal(3, 3)
         time.sleep(1.0)
         # rotate (90, 90 , True)
-       
+
     except rospy.ROSInterruptException:
         rospy.loginfo("node terminated.")

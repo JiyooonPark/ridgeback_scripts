@@ -5,9 +5,11 @@ import rospy
 from tools import *
 from tools_cmd_vel import *
 
-angle_90=0
+angle_90 = 0
 
-# laser scanner 
+# laser scanner
+
+
 def callback_laser(msg):
     global angle_90
 
@@ -24,10 +26,10 @@ def keep_distance(distance):
     rospy.sleep(1)
 
     while True:
-        if angle_90 - distance > thresh: # 1.3m - 1m  = 0.3 m > 0.1
+        if angle_90 - distance > thresh:  # 1.3m - 1m  = 0.3 m > 0.1
             print(angle_90, end=": ")
             move_forward(speed, duration)
-        elif angle_90 - distance < -thresh: # 0.7m - 1m  = -0.3 m < -0.1
+        elif angle_90 - distance < -thresh:  # 0.7m - 1m  = -0.3 m < -0.1
             print(angle_90, end=": ")
             move_backward(speed, duration)
         else:
@@ -35,7 +37,8 @@ def keep_distance(distance):
             print("done")
             break
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
 
     rospy.init_node('cylinder_laser_right')
 

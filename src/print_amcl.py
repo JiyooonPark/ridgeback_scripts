@@ -11,6 +11,7 @@ def callback_amcl(msg):
 
 
 rospy.init_node('check_amcl_pose')
-odom_sub = rospy.Subscriber('/amcl_pose', PoseWithCovarianceStamped, callback)
+odom_sub = rospy.Subscriber(
+    '/amcl_pose', PoseWithCovarianceStamped, callback_amcl)
 
 rospy.spin()

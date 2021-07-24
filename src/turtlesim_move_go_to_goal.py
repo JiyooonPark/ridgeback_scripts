@@ -90,6 +90,7 @@ class TurtleBot:
         # If we press control + C, the node will stop.
         rospy.spin()
 
+
 if __name__ == '__main__':
     try:
         x = TurtleBot()
