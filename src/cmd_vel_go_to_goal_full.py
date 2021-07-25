@@ -7,12 +7,12 @@ import rospy
 
 # go_to_goal_full.py
 
-if __name__=="__main__":
-    # init x, y : the location wanted when facing the wall 
+if __name__ == "__main__":
+    # init x, y : the location wanted when facing the wall
     x_init = 3
     y_init = -1
 
-    # igoal x,y : the final goal 
+    # goal x,y : the final goal
     x_goal = 3
     y_goal = -3
 

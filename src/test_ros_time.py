@@ -25,7 +25,7 @@ rospy.init_node('rostime')
 #     print("hey")
 
 seconds = time.time()
-print("Seconds since epoch =", seconds)	
-while time.time() - seconds <1:
+print("Seconds since epoch =", seconds)
+while time.time() - seconds < 1:
     pass
-print("Seconds since epoch =", time.time())	
+print("Seconds since epoch =", time.time())

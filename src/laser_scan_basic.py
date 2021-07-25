@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 from sensor_msgs.msg import LaserScan
 import rospy
-from tools import *
+import tools_etc
 
 
 def callback_laser(msg):
@@ -20,9 +20,9 @@ def callback_laser(msg):
     # print ("180:{:.4}".format(msg.ranges[max_range-1]))
 
     # 3. check 60, 90, 120 distance
-    angle_60 = average(msg.ranges, round(max_range/3))
-    angle_90 = average(msg.ranges, round(max_range/2))
-    angle_120 = average(msg.ranges, round(max_range*2/3))
+    angle_60 = tools_etc.average(msg.ranges, round(max_range/3))
+    angle_90 = tools_etc.average(msg.ranges, round(max_range/2))
+    angle_120 = tools_etc.average(msg.ranges, round(max_range*2/3))
 
     print("{:.4} {:.4} {:.4}".format(angle_60, angle_90, angle_120))
 

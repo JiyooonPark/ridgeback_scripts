@@ -3,11 +3,8 @@
 import rospy
 from sensor_msgs.msg import LaserScan
 
-from tools import *
-from tool_callbacks import *
-from tools_cmd_vel import *
-from cylinder_laser_scan_distance import *
-from cylinder_laser_scan_align import *
+import tools_etc
+import tools_cylinder
 
 '''
 flow 
@@ -29,21 +26,20 @@ def callback_laser(msg):
 
     global angle_110, angle_70, angle_90
 
-    angle_70 = average(msg.ranges, 70)
-    angle_90 = average(msg.ranges, 90)
-    angle_110 = average(msg.ranges, 110)
+    angle_70 = tools_etc.average(msg.ranges, 70)
+    angle_90 = tools_etc.average(msg.ranges, 90)
+    angle_110 = tools_etc.average(msg.ranges, 110)
 
 
 if __name__ == "__main__":
 
     rospy.init_node('cylinder_rotate')
     sub = rospy.Subscriber('/front/scan', LaserScan, callback_laser)
+    i = 0
     while True:
-        keep_align()
-        keep_distance(1)
+        if angle_90 == 0:
+            print('ignoring')
+        else:
 
-        a, c = angle_110, angle_90
-        b = triangle(20, a, c)
-        squeezed = squeeze_triangle(a, b, c)
-        x, y = squeezed[2], squeezed[1]
-        move_relative_rotate(x, y-0.15)
+            tools_cylinder.convex_rotate(angle_90, angle_110)
+        i += 1
