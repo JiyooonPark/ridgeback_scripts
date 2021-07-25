@@ -18,6 +18,7 @@ def callback_laser(msg):
 
 
 def keep_distance(distance):
+    sub = rospy.Subscriber('/front/scan', LaserScan, callback_laser)
 
     speed = 0.05
     duration = 0.05
@@ -42,6 +43,5 @@ if __name__ == "__main__":
 
     rospy.init_node('cylinder_laser_right')
 
-    sub = rospy.Subscriber('/front/scan', LaserScan, callback_laser)
     keep_distance(1.0)
     # rospy.spin()

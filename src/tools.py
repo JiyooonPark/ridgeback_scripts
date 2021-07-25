@@ -15,7 +15,7 @@ def average(range, degree, interval=5):
 def triangle(theta, a, c):
     theta = math.radians(theta)
     b = math.sqrt((c*math.sin(theta))**2 + ((a-c*math.cos(theta))**2))
-    print("b is :", b)
+    # print("b is :", b)
     return b
 
 # calculates the difference of angles
@@ -32,7 +32,8 @@ def rad(degree):
 
 
 def squeeze_triangle(a, b, c):
-    return b, b**2/a, b*c/a
+    # return b, (b**2)/a, (b*c)/a
+    return b, b*math.sin(rad(20)), b*math.cos(rad(20))
 
 
 def two_edge_one_angle(a, c, angle):
