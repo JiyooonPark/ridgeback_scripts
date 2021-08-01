@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import tf
 import rospy
 from geometry_msgs.msg import Twist
@@ -81,7 +81,7 @@ def angle_to_a(a):
 
 
 def callback_laser(msg):
-    print len(msg.ranges)
+    print(len(msg.ranges))
 
 
 def right_angle():

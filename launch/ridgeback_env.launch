@@ -2,6 +2,9 @@
     <include file="$(find ridgeback_gazebo)/launch/ridgeback_world.launch">
     </include>
 
+    <include file="$(find ridgeback_navigation)/launch/amcl_demo.launch">
+    </include>
+
     <include file="$(find ridgeback_viz)/launch/view_robot.launch">
     </include>
 </launch>

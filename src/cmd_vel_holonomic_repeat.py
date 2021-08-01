@@ -28,7 +28,7 @@ def publish_cmd_vel():
     print("init x: {:.3f} y: {:.3f}".format(x_init, y_init))
     seconds = time.time()
     for i in range(5):
-        print "in ", str(i+1), "st loop"
+        print("in ", str(i+1), "st loop")
 
         cmd.linear.x = -cmd.linear.x
         cmd.linear.y = -cmd.linear.y
