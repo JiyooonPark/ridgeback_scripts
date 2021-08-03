@@ -6,5 +6,6 @@
     </include>
 
     <include file="$(find ridgeback_viz)/launch/view_robot.launch">
+    <arg name="config" default="localization"/>
     </include>
 </launch>

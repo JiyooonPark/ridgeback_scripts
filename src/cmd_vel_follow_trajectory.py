@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-from geometry_msgs.msg import Twist, PoseWithCovarianceStamped
-from nav_msgs.msg import Odometry
+
 import rospy
+from geometry_msgs.msg import Twist, PoseWithCovarianceStamped
 import math
 
 global x, y, w
@@ -31,7 +31,7 @@ def go_to_goal(x_goal, y_goal):
     while (True):
         i = i+1
 
-        K_linear = -0.08
+        K_linear = 0.05
         distance = abs(math.sqrt(((x_goal-x) ** 2) + ((y_goal-y) ** 2)))
 
         x_dist = x_goal - x
@@ -70,14 +70,11 @@ def follow_traj(path):
 
 if __name__ == '__main__':
     try:
-        rospy.init_node('follow_trajectory')
-        # amcl_sub = rospy.Subscriber(
-        #     '/amcl_pose', PoseWithCovarianceStamped, get_current_position)
-        odom_sub = rospy.Subscriber('/odom', Odometry, get_current_position)
+        rospy.init_node('move_to_fixed_pose')
+        amcl_sub = rospy.Subscriber(
+            '/amcl_pose', PoseWithCovarianceStamped, get_current_position)
         rospy.sleep(0.5)
-
-        path = [(0, 0), (2, 1), (3, 3), (4, 6)]
+        path = [(0, 0), (1, 1)]
         follow_traj(path)
-
     except rospy.ROSInterruptException:
         rospy.loginfo("Navigation test finished.")
