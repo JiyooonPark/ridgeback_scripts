@@ -31,7 +31,7 @@ def go_to_goal(x_goal, y_goal):
     while (True):
         i = i+1
 
-        K_linear = 0.05
+        K_linear = 0.01
         distance = abs(math.sqrt(((x_goal-x) ** 2) + ((y_goal-y) ** 2)))
 
         x_dist = x_goal - x
@@ -52,7 +52,7 @@ def go_to_goal(x_goal, y_goal):
         else:
             continue
 
-        if (distance < 0.05):
+        if (distance < 0.02):
             print('done')
             break
 

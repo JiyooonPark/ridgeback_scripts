@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from scipy import interpolate
 import rospy
 from geometry_msgs.msg import Twist, PoseWithCovarianceStamped
 import math
@@ -31,7 +32,7 @@ def go_to_goal(x_goal, y_goal):
     while (True):
         i = i+1
 
-        K_linear = 0.05
+        K_linear = 0.04
         distance = abs(math.sqrt(((x_goal-x) ** 2) + ((y_goal-y) ** 2)))
 
         x_dist = x_goal - x
@@ -68,13 +69,23 @@ def follow_traj(path):
         print(x, y, w)
 
 
+def f(xx):
+    x_points = [-4, -3, -2, -1, 0, 1, 2, 3, 4]
+    y_points = [-6, 1, 2, 4, -1, 4, 0, -1, -4]
+
+    tck = interpolate.splrep(x_points, y_points)
+    return interpolate.splev(xx, tck)
+
+
 if __name__ == '__main__':
     try:
         rospy.init_node('move_to_fixed_pose')
         amcl_sub = rospy.Subscriber(
             '/amcl_pose', PoseWithCovarianceStamped, get_current_position)
         rospy.sleep(0.5)
-        path = [(0, 0), (1, 1)]
+        path_x = [0.4 * n for n in range(-10, 10)]
+        path_y = [float(f(n)) for n in path_x]
+        path = zip(path_x, path_y)
         follow_traj(path)
     except rospy.ROSInterruptException:
         rospy.loginfo("Navigation test finished.")

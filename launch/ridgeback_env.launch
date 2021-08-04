@@ -1,5 +1,5 @@
 <launch>
-    <include file="$(find ridgeback_gazebo)/launch/new_sk_building.launch">
+    <include file="$(find ridgeback_gazebo)/launch/ridgeback_world.launch">
     </include>
 
     <include file="$(find ridgeback_navigation)/launch/amcl_demo.launch">
