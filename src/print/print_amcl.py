@@ -1,6 +1,5 @@
 #! /usr/bin/env python
 import rospy
-from nav_msgs.msg import Odometry
 from geometry_msgs.msg import PoseWithCovarianceStamped
 
 
@@ -10,8 +9,7 @@ def callback_amcl(msg):
         msg.pose.pose.position.x, msg.pose.pose.position.y, msg.pose.pose.orientation.w))
 
 
-rospy.init_node('check_amcl_pose')
-odom_sub = rospy.Subscriber(
-    '/amcl_pose', PoseWithCovarianceStamped, callback_amcl)
+rospy.init_node('print_amcl_pose')
+odom_sub = rospy.Subscriber('/amcl_pose', PoseWithCovarianceStamped, callback_amcl)
 
 rospy.spin()
