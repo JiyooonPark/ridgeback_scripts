@@ -2,8 +2,8 @@
 from sensor_msgs.msg import LaserScan
 import rospy
 
-import tools_etc
-import tools_cmd_vel
+from tools import tools_etc
+from tools import tools_cmd_vel
 
 angle_90 = 0
 

@@ -2,9 +2,6 @@
     <include file="$(find ridgeback_gazebo)/launch/wall_env.launch">
     </include>
 
-    <include file="$(find ridgeback_navigation)/launch/amcl_demo.launch">
-    </include>
-
     <include file="$(find ridgeback_viz)/launch/view_robot.launch">
     <arg name="config" default="localization"/>
     </include>

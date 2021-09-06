@@ -15,12 +15,11 @@ def get_current_position(msg):
     x = msg.pose.pose.position.x
     y = msg.pose.pose.position.y
     w = msg.pose.pose.orientation.w
-    print('in function',  x, y, w)
+    print('in function', x, y, w)
     return x, y, w
 
 
 def go_to_goal(x_goal, y_goal):
-
     velocity_message = Twist()
     cmd_vel_topic = '/cmd_vel'
     velocity_publisher = rospy.Publisher(cmd_vel_topic, Twist, queue_size=10)
@@ -29,18 +28,18 @@ def go_to_goal(x_goal, y_goal):
 
     i = 0
     while (True):
-        i = i+1
+        i = i + 1
 
         K_linear = 0.01
-        distance = abs(math.sqrt(((x_goal-x) ** 2) + ((y_goal-y) ** 2)))
+        distance = abs(math.sqrt(((x_goal - x) ** 2) + ((y_goal - y) ** 2)))
 
         x_dist = x_goal - x
         y_dist = y_goal - y
 
         velocity_message.linear.x = K_linear * \
-            (x_dist / (abs(x_dist) + abs(y_dist)))
+                                    (x_dist / (abs(x_dist) + abs(y_dist)))
         velocity_message.linear.y = K_linear * \
-            (y_dist / (abs(x_dist) + abs(y_dist)))
+                                    (y_dist / (abs(x_dist) + abs(y_dist)))
         velocity_message.angular.z = 0
 
         velocity_publisher.publish(velocity_message)

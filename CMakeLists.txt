@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(ros_repo)
+project(ridgeback_scripts)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -27,4 +27,4 @@ include_directories(
 )
 
 ##add_executable(simple_navigation src/simple_navigation.cpp)
-##target_link_libraries(ros_repo ${catkin_LIBRARIES})
+##target_link_libraries(ridgeback_scripts ${catkin_LIBRARIES})
