@@ -14,6 +14,6 @@ def callback_odom(msg):
 
 
 rospy.init_node('print_odom')
-odom_sub = rospy.Subscriber('/odom', Odometry, callback_odom)
+odom_sub = rospy.Subscriber('/odometry/filtered', Odometry, callback_odom)
 
 rospy.spin()
