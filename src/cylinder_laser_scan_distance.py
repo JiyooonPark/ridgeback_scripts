@@ -9,13 +9,10 @@ angle_90 = 0
 
 # laser scanner
 
-
 def callback_laser(msg):
     global angle_90
 
     angle_90 = tools_etc.average(msg.ranges, 90)
-    # print(angle_90)
-
 
 def keep_distance(distance):
     sub = rospy.Subscriber('/front/scan', LaserScan, callback_laser)
