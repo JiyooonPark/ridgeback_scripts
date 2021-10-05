@@ -9,9 +9,10 @@ https://www.calculator.net/triangle-calculator.html?vc=&vx=1&vy=&va=20&vz=1.5&vb
 
 def average(range, degree, interval=5):
     length = len(range)
+    range = list(range)
     one = length/180
-    # print(int(degree-interval)*one)
-    return (range[int((degree-interval)*one)]+range[int(degree*one)] + range[int((degree+interval)*one)])/3
+    # print([int((degree-interval))])
+    return (range[int((degree-interval))]+range[int(degree)] + range[int((degree+interval))])/3
 
 
 def triangle(theta, a, c):

@@ -1,4 +1,4 @@
-
+import math
 # laser scanner
 def callback_laser(msg):
     global angle_120, angle_60, angle_90, m

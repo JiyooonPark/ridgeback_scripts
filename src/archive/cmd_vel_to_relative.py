@@ -11,7 +11,7 @@ if __name__ == "__main__":
 
     try:
         rospy.init_node('cmd_vel_go_to_goal')
-        rospy.loginfo("started: cmd_vel_go_to_goal")
+        rospy.loginfo("started: cmdzzz_vel_go_to_goal")
         tools_cmd_vel.move_relative(x_goal, y_goal, duration=10)
     except rospy.ROSInterruptException:
         rospy.loginfo("Error occured.")
