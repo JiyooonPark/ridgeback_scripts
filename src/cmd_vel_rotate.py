@@ -14,5 +14,5 @@ if __name__ == "__main__":
     rospy.init_node('cmd_vel_rotate')
     odom_sub = rospy.Subscriber(
         '/odometry/filtered', Odometry, tools_callbacks.callback_odom)
-    tools_cmd_vel.turn_right(360)
+    tools_cmd_vel.turn_right(180)
     # tools_cmd_vel.turn_right(30)
