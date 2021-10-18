@@ -26,26 +26,21 @@ def callback_tf(msg):
 if __name__ == "__main__":
     rospy.init_node('print_tf')
 
-
     odom_sub = rospy.Subscriber('/tf', tfMessage, callback_tf)
-    rospy.sleep(1)
-    print(angle)
-    rotation_matrix = np.array([[math.cos(angle), -math.sin(angle)], 
-                    [math.sin(angle), math.cos(angle)]])
-    print(rotation_matrix)
-    b = np.array([[1],[0]])
-    # print(np.matmul(a, b))
-
-    # goal x,y : the final goal
-    x_goal = -3
-    y_goal = -3
-    goal = np.array([[x_goal],[y_goal]])
-    r_goal = np.matmul(rotation_matrix, goal)
-    print('new goal', r_goal)
-
+    
     try:
-        # rospy.init_node('tf_goal')
+        x_goal = 1
+        y_goal = 0
+        goal = np.array([[x_goal],[y_goal]])
+        rospy.sleep(1)
+        rotation_matrix = np.array([[math.cos(angle), -math.sin(angle)], 
+                [math.sin(angle), math.cos(angle)]])
+        print (rotation_matrix)
+        print(angle)
+        r_goal = np.matmul(rotation_matrix, goal)
+        print('new goal', r_goal)
         tools_cmd_vel.move_relative(float(r_goal[0][0]), float(r_goal[1][0]), duration=10)
     except rospy.ROSInterruptException:
         rospy.loginfo("Error occured.")
+
 
