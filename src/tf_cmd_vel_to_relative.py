@@ -29,7 +29,7 @@ if __name__ == "__main__":
     odom_sub = rospy.Subscriber('/tf', tfMessage, callback_tf)
     
     try:
-        x_goal = 1
+        x_goal = -1
         y_goal = 0
         goal = np.array([[x_goal],[y_goal]])
         rospy.sleep(1)
