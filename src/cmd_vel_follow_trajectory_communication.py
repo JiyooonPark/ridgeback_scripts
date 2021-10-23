@@ -3,7 +3,7 @@ from tools import tools_cmd_vel
 import math
 import rospy
 import time
-from geometry_msgs.msg import Twist, PoseWithCovarianceStamped
+from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from std_msgs.msg import String
 
@@ -15,13 +15,6 @@ PI = math.pi
 
 received_message = {}
 send_message = {}
-
-'''
-number: instruction number
-status: executing, done, error, waiting
-==============
-4 done
-'''
 
 
 def get_current_position(msg):
