@@ -1,3 +1,6 @@
+## Basic ros 
+
+```
 alias eb='gedit ~/.bashrc'
 alias sb='source ~/.bashrc'
 alias cw='cd ~/catkin_ws'
@@ -11,3 +14,5 @@ alias kg='killall gzserver'
 
 source /opt/ros/melodic/setup.bash
 source ~/catkin_ws/devel/setup.bash
+```
+
