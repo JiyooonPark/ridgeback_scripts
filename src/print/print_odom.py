@@ -9,7 +9,7 @@ def callback_odom(msg):
     global i
 
     i = i+1
-    if i % 50 == 0:
+    if i % 2 == 0:
         print("x: {:.3f} y: {:.3f} w: {:.3f}".format(msg.pose.pose.position.x, msg.pose.pose.position.y, msg.pose.pose.orientation.w))
 
 

@@ -7,7 +7,6 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Twist
 import math
 
-global x, y, w
 x = 1
 y = 1
 w = 1
@@ -76,9 +75,9 @@ def go_to_goal(x_goal, y_goal):
 if __name__ == '__main__':
     try:
         rospy.init_node('move_to_fixed_pose')
-        odom_sub = rospy.Subscriber('/odometry/filtered', Odometry, get_current_position)
+        odom_sub = rospy.Subscriber('/odom', Odometry, get_current_position)
         rospy.sleep(0.5)
-        result = go_to_goal(2, 2)
+        result = go_to_goal(2, 0)
         if result:
             rospy.loginfo("Goal execution done!")
     except rospy.ROSInterruptException:
