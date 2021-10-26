@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2.7
 
 import rospy
 from tools import tools_cmd_vel
@@ -21,15 +21,15 @@ def callback_odom(msg):
         angle = -yaw*180/math.pi
     else:
         angle = 360-yaw*180/math.pi
-    if i%30==0:
-        print(f"angle : {round(angle, 2)}")
+    # if i%30==0:
+    #     print(f"angle : {round(angle, 2)}")
     i+=1
     rad = math.radians(angle)
 
 if __name__ == "__main__":
     rospy.init_node('print_tf')
 
-    odom_sub = rospy.Subscriber ('/odom', Odometry, callback_odom)
+    odom_sub = rospy.Subscriber ('/odomerty/filtered', Odometry, callback_odom)
     
     try:
         x_goal = 1

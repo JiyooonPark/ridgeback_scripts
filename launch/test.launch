@@ -2,7 +2,6 @@
   <arg name="use_sim_time" default="true" />
   <arg name="gui" default="true" />
   <arg name="headless" default="false" />
-  <!--arg name="world_name" default="$(find ridgeback_gazebo)/worlds/cylinder.world" /-->
   <arg name="world_name" default="$(find ridgeback_gazebo)/worlds/test.world" />
   <!-- Robot Spawn Pose -->
   <arg name="x" default="0"/>
@@ -31,7 +30,6 @@
     <arg name="y" value="$(arg y)" />
     <arg name="z" value="$(arg z)" />
     <arg name="yaw" value="$(arg yaw)" />
-    <arg name="joystick" value="$(arg joystick)" />
   </include>
 
 </launch>
