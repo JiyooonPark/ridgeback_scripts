@@ -6,7 +6,7 @@ from tools import tools_cmd_vel
 if __name__ == "__main__":
 
     # goal x,y : the final goal
-    x_goal = -1
+    x_goal = 0.3
     y_goal = 0
 
     try:

@@ -18,13 +18,13 @@ def callback(msg):
     
     pose = msg.pose.pose.position
     if i < 5:
-        # print(f'init pose: {round(pose.x, 3)}, {round(pose.y, 3)}')
+        print(f'init pose: {round(pose.x, 3)}, {round(pose.y, 3)}')
         init_pose = [round(pose.x, 3), round(pose.y, 3)]
 
     i+=1
-    if i % 80 == 0:
+    # if i % 80 == 0:
         # print(f'pose: {round(pose.x, 3)}, {round(pose.y, 3)}')
-        final_pose = [pose.x, pose.y]
+    final_pose = [pose.x, pose.y]
     x = pose.x
     y = pose.y
     z = pose.z
@@ -49,13 +49,13 @@ def callback_laser(msg):
 
 
 def right_angle():
-    thresh = 0.008
+    thresh = 0.01
     rospy.sleep(1)
     while True:
         if angle_120 - angle_60 > thresh:
-            tools_cmd_vel.turn_right(0.05, 0.1)
+            tools_cmd_vel.turn_right(0.05)
         elif angle_120 - angle_60 < -thresh:
-            tools_cmd_vel.turn_left(0.05, 0.1)
+            tools_cmd_vel.turn_left(0.05)
         else:
             print(angle_60, angle_120, angle_120-angle_60)
             print("done?")
@@ -86,8 +86,6 @@ def go_to_goal(x_goal, y_goal):
 
         if (distance < 0.01):
             print('done')
-            return True
-    return False
 
 def get_goal( x_var, y_var, distance):
     var = (distance**2 / (x_var**2+y_var**2))**0.5
@@ -99,11 +97,11 @@ if __name__ == "__main__":
     sub = rospy.Subscriber('/front/scan', LaserScan,callback_laser)
     right_angle()
 
-    odom_sub = rospy.Subscriber('/odometry/filtered', Odometry, callback)
+    odom_sub = rospy.Subscriber('/odom', Odometry, callback)
 
     # goal x,y : the final goal
     x_goal = 0
-    y_goal = -1
+    y_goal = -0.5
     try:
         tools_cmd_vel.move_relative(x_goal, y_goal, duration=10)
     except rospy.ROSInterruptException:
