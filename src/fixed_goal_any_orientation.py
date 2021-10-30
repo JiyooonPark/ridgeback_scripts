@@ -3,7 +3,7 @@
 import rospy
 from tools import tools_cmd_vel
 from nav_msgs.msg import Odometry
-from tf.transformations import euler_from_quaternion, quaternion_from_euler
+from tf.transformations import euler_from_quaternion
 import numpy as np
 import math
 
@@ -14,8 +14,8 @@ pose_y = 0
 
 
 def callback_odom(msg):
-    global angle, rad
-    global pose_x, pose_y
+    global angle, rad, pose_x, pose_y
+
     pose_x = msg.pose.pose.position.x + 1
     pose_y = msg.pose.pose.position.y
 

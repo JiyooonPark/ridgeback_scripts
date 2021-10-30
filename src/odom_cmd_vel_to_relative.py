@@ -30,19 +30,19 @@ if __name__ == "__main__":
 
     odom_sub = rospy.Subscriber('/odom', Odometry, callback_odom)
     rospy.spin()
-    # try:
-    #     x_goal = 1
-    #     y_goal = 0
-    #     goal = np.array([[x_goal],[y_goal]])
-    #     rospy.sleep(1)
-    #     rotation_matrix = np.array([[math.cos(angle), -math.sin(angle)], 
-    #             [math.sin(angle), math.cos(angle)]])
-    #     print (rotation_matrix)
-    #     print(angle)
-    #     r_goal = np.matmul(rotation_matrix, goal)
-    #     print('new goal', r_goal)
-    #     tools_cmd_vel.move_relative(float(r_goal[0][0]), float(r_goal[1][0]), duration=10)
-    # except rospy.ROSInterruptException:
-    #     rospy.loginfo("Error occured.")
+    try:
+        x_goal = 1
+        y_goal = 0
+        goal = np.array([[x_goal],[y_goal]])
+        rospy.sleep(1)
+        rotation_matrix = np.array([[math.cos(angle), -math.sin(angle)], 
+                [math.sin(angle), math.cos(angle)]])
+        print (rotation_matrix)
+        print(angle)
+        r_goal = np.matmul(rotation_matrix, goal)
+        print('new goal', r_goal)
+        tools_cmd_vel.move_relative(float(r_goal[0][0]), float(r_goal[1][0]), duration=10)
+    except rospy.ROSInterruptException:
+        rospy.loginfo("Error occured.")
 
 
