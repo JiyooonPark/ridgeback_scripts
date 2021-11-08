@@ -1,46 +1,18 @@
-#:frog:Ridgeback + iiwa communication pipeline
+## Ridgeback + iiwa communication system
 
-###:purple_heart:Used topics:
+|#| Ridgeback | iiwa | Extra |
+|---| ----------- | ----------- | ----------- |
+| 1 | | | input: picture<br>output: stippled points file <br> | 
+| 2 | | input: stippled point file <br> output: farmost left, right (y) point location<br> generates drawing wall coordinates transforms it into ridgeback world coordinates | |
+| 3 | input: farmost y drawing coordinates <br> output: list of length of each drawing section, position list<br> run trajectory planning code and generate path  | | |
+| 4 | |input: drawing length of each location, position list<br> convert each section drawing instruction to start from (0,0)| |
+| 5 | output: move done message <br> move to initial position | | | |
+| 6 | input: move done message <br> output: drawing done message <br> | |
 
-Format: 
- 
-    /iiwa_ridgeback_communicaiton/sender
+## message used
 
-1. /iiwa_ridgeback_communicaiton/iiwa
-2. /iiwa_ridgeback_communicaiton/ridgeback
-
-###:purple_heart:Used message
-
-Type:
-
-    std_msgs <String>
-
-Content:
-```commandline
-number: instruction number
-status: 
-   start: start instruction
-   executing: doing instructions
-   done: done executing instruction
-   error: error occured during execution
-   waiting: done instruction and waiting for the other robot to send done signal
-```
-
-For example: 
-
-    /iiwa_ridgeback_communicaiton/ridgeback
-    4 done
-meaning: 
-
-ridgeback is done doing instruction 4
-
-###:purple_heart:Pipeline
-| Ridgeback | iiwa |
-| ------------- | ------------- | 
-| 0 start | 0 waiting |
-| 0 executing | 0 waiting |
-| 0 done | 0 waiting |
-| 0 waiting | 0 start |
-| 0 waiting | 0 executing |
-| 0 waiting | 0 done |
-| 1 start | 1 waiting |
+|#| message name | message type | content |
+|---|-----| ----------- | ----------- | 
+|2 |? |float [2] | left y, right y |
+|3 | ?|float list1<br> float list2 | length of each segment<br> ridgeback positions|
+|4-inf |? | int| 0 if waiting for other robot to execute <br> # if executing instruction|
