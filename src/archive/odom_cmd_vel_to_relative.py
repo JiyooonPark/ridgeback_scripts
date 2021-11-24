@@ -17,19 +17,17 @@ def callback_odom(msg):
     angle = 2 * math.acos(orientation.w)
     degree = ((angle/(math.pi*2))*360.0)
     angle = degree*(math.pi/180)
-    # if i<5:
-    #     print(angle)
-    
-    if i%30==0:
-        print(round(degree,1))
-    i+=1
+
+    # if i%30==0:
+        # print(round(degree,1))
+    # i+=1
 
 if __name__ == "__main__":
     rospy.init_node('print_tf')
-    print(math.pi)
 
     odom_sub = rospy.Subscriber('/odom', Odometry, callback_odom)
-    rospy.spin()
+    # rospy.spin()
+
     try:
         x_goal = 1
         y_goal = 0
@@ -42,6 +40,7 @@ if __name__ == "__main__":
         r_goal = np.matmul(rotation_matrix, goal)
         print('new goal', r_goal)
         tools_cmd_vel.move_relative(float(r_goal[0][0]), float(r_goal[1][0]), duration=10)
+
     except rospy.ROSInterruptException:
         rospy.loginfo("Error occured.")
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import rospy
 from nav_msgs.msg import Odometry
 from tf.transformations import euler_from_quaternion
@@ -6,7 +6,8 @@ from geometry_msgs.msg import Twist
 import math
 
 roll = pitch = yaw = 0.0
-target = 300
+
+target = 0
 angle=-1010
 kp=0.5
 
@@ -16,7 +17,6 @@ def get_rotation (msg):
     orientation_q = msg.pose.pose.orientation
     orientation_list = [orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w]
     (roll, pitch, yaw) = euler_from_quaternion (orientation_list)
-    # print (yaw)
     if yaw<0:
         angle = -yaw*180/math.pi
     else:
@@ -30,18 +30,19 @@ if __name__=='__main__':
     r = rospy.Rate(10)
     command =Twist()
 
-    i=0
-
-    if 0<target<180:
+    if 0<=target<=180:
         real_target = -target
     else:
         real_target = 360-target
 
-    print(f'target: {target}, real_target: {real_target}')
+    # print(f'target: {target}, real_target: {real_target}')
     
     while True:
+
         target_rad = real_target*math.pi/180
+
         command.angular.z = kp * (target_rad-yaw)
+        
         pub.publish(command)
         r.sleep()
         if abs(yaw*180/math.pi-real_target)<2:

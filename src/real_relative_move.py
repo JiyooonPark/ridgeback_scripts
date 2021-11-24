@@ -2,7 +2,12 @@
 
 import rospy
 from tools import tools_cmd_vel
+import time
+from geometry_msgs.msg import Twist
+
+
 def get_tracker_pose(msg):
+    pass
     
 
 def move_relative(x, y, duration=5):
@@ -23,7 +28,7 @@ def move_relative(x, y, duration=5):
 if __name__ == "__main__":
 
     # goal x,y : the final goal
-    x_goal = -1
+    x_goal = 2
     y_goal = 0
 
     try:

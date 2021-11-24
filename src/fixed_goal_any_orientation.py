@@ -37,8 +37,8 @@ if __name__ == "__main__":
     rospy.sleep(1)
     
     try:
-        x_goal = 3
-        y_goal = 2
+        x_goal = 0
+        y_goal = 0
 
         x_move = x_goal-pose_x
         y_move = y_goal-pose_y
