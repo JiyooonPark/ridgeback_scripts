@@ -100,7 +100,7 @@ if __name__ == "__main__":
     rospy.init_node('scan_values')
     sub = rospy.Subscriber('/front/scan', LaserScan,callback_laser)
     odom_sub = rospy.Subscriber('/vive/LHR_BD4ED973_pose', PoseWithCovarianceStamped, get_current_position)
-    right_angle()
+    # right_angle()
 
     odom_sub = rospy.Subscriber('/odom', Odometry, callback)
 
