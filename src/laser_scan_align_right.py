@@ -1,13 +1,13 @@
 #! /usr/bin/env python3
 from sensor_msgs.msg import LaserScan
 import rospy
-
 from tools import tools_cmd_vel
-from tools import tools_callbacks
 
+# ========= GLOBAL VARIABLES =========== #
 angle_90 = 0
 angle_60 = 0
-angle_120 = 00
+angle_120 = 0
+
 def callback_laser(msg):
     global angle_120, angle_60, angle_90
 
@@ -38,7 +38,6 @@ def right_angle():
 
 if __name__ == "__main__":
     rospy.init_node('scan_values')
-    sub = rospy.Subscriber('/front/scan', LaserScan,
-                           callback_laser)
+    sub = rospy.Subscriber('/front/scan', LaserScan, callback_laser)
     right_angle()
     # rospy.spin()

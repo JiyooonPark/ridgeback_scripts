@@ -1,18 +1,23 @@
 #! /usr/bin/env python3
-from sensor_msgs.msg import LaserScan
+
 import rospy
-from geometry_msgs.msg import Twist
-from tools import tools_cmd_vel
+
+from sensor_msgs.msg import LaserScan
+from geometry_msgs.msg import Twist, PoseWithCovarianceStamped
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import PoseWithCovarianceStamped
+
+from tools import tools_cmd_vel
 import math
 
+# ========= GLOBAL VARIABLES =========== #
 init_pose = []
 final_pose = []
 i = 0
 
 def callback(msg):
+
     global i, final_pose, init_pose, position_x, position_y, position_z
+    
     pose_position = msg.pose.pose.position
     position_x = pose_position.x
     position_y = pose_position.y

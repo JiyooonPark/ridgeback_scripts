@@ -7,12 +7,13 @@ if __name__ == "__main__":
 
     # goal x,y : the final goal
     x_goal = 0
-    y_goal = 0.3
+    y_goal = 0.5
 
     try:
         rospy.init_node('relative_move')
         rospy.loginfo("moving to goal")
         tools_cmd_vel.move_relative(x_goal, y_goal, duration=3)
+        
     except rospy.ROSInterruptException:
         rospy.loginfo("Error occured.")
 

@@ -21,8 +21,10 @@ def callback_odom(msg):
         angle = -yaw*180/math.pi
     else:
         angle = 360-yaw*180/math.pi
+
     # if i%30==0:
     #     print(f"angle : {round(angle, 2)}")
+
     i+=1
     rad = math.radians(angle)
 
@@ -36,13 +38,18 @@ if __name__ == "__main__":
         y_goal = 0
         goal = np.array([[x_goal],[y_goal]])
         rospy.sleep(1)
-        rotation_matrix = np.array([[math.cos(rad), -math.sin(rad)], 
-                [math.sin(rad), math.cos(rad)]])
+        rotation_matrix = np.array([
+            [math.cos(rad), -math.sin(rad)], 
+            [math.sin(rad), math.cos(rad)]])
+
         print (rotation_matrix)
         print(angle)
+
         r_goal = np.matmul(rotation_matrix, goal)
         print('new goal', r_goal)
+
         tools_cmd_vel.move_relative(float(r_goal[0][0]), float(r_goal[1][0]), duration=10)
+        
     except rospy.ROSInterruptException:
         rospy.loginfo("Error occured.")
 

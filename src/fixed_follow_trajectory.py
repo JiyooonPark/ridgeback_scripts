@@ -62,8 +62,8 @@ if __name__ == '__main__':
         odom_sub = rospy.Subscriber('/odometry/filtered', Odometry, get_current_position)
         rospy.sleep(0.5)
 
-        x_positive = [0]
-        y_positive = [0]
+        x_positive = [0, 1, 4, -1]
+        y_positive = [0, -2, 3, 1]
 
         path = zip(x_positive, y_positive)
 

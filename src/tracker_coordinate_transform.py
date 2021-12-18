@@ -36,11 +36,15 @@ if __name__ == '__main__':
 
         odom_init = np.array([odom_x, odom_y, odom_z])
         tracker_init = np.array([tracker_x, tracker_y, tracker_z])
+
         tools_cmd_vel.move_relative(1, 0)
+
         odom_post = np.array([odom_x, odom_y, odom_z])
         tracker_post = np.array([tracker_x, tracker_y, tracker_z])
+
         odom_vector = odom_post - odom_init
         tracker_vector = tracker_post = tracker_init
+        
         transformation = np.matmul(np.linalg.inx(tracker_vector), odom_vector)
         print(transformation)
 
