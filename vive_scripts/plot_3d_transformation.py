@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 
-import rospy
-from geometry_msgs.msg import PoseWithCovarianceStamped
 import numpy as np
 
 # ============= VARIABLES ============== #
@@ -90,7 +88,7 @@ def get_current_position(msg):
         print(R_M)
 
     if vive_i > test_time2:
-        world_frame = np.around(np.matmul(R_M, np.array(vive_pose1)), decimals=3)
+        world_frame = np.around(np.matmul(np.array(vive_pose1), R_M), decimals=3)
         linear_vx.append(round(world_frame[0],3))
         linear_vy.append(round(world_frame[1],3))
         linear_vz.append(round(world_frame[2],3))
