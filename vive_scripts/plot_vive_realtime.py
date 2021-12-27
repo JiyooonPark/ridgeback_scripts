@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
-
 import rospy
 from geometry_msgs.msg import PoseWithCovarianceStamped
 import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 # ============= VARIABLES ============== #
 graph_limit = 3
@@ -38,7 +39,7 @@ def get_current_position(msg):
         linear_z.append(round(position_z,3))
 
     global vive_pose0, vive_pose1
-    global vive_i, transform_vector, R_M 
+    global vive_i, transform_vector
 
     vive_i+=1
 
@@ -53,51 +54,32 @@ def get_current_position(msg):
 
         moved_vector = np.array(vive_pose1)- np.array(vive_pose0)
 
-        theta_rx = angle_between(np.array([1,0,0]), moved_vector)
-        sin_rx, cos_rx = np.sin(theta_rx), np.cos(theta_rx)
-
-        # get the rotation matrix on x axis
-        R_Mx = np.array([[1,      0,       0],
-                            [0, cos_rx, sin_rx],
-                            [0, -sin_rx,  cos_rx]])
-
-        after_x = np.dot(R_Mx,moved_vector)
-        theta_ry = angle_between(np.array([0,1,0]), after_x)
-        sin_ry, cos_ry = np.sin(theta_ry), np.cos(theta_ry)
-
-        # get the rotation matrix on y axis
-        R_My = np.array([[cos_ry, 0, -sin_ry],
-                            [     0, 1,       0],
-                            [sin_ry, 0,  cos_ry]])
-
-        after_xy = np.dot(R_My,after_x)
-        theta_rz = angle_between(np.array([0,0,1]), after_xy)
-        sin_rz, cos_rz = np.sin(theta_rz), np.cos(theta_rz)
-
-        # get the rotation matrix on z axis
-        R_Mz = np.array([[cos_rz, sin_rz, 0],
-                            [-sin_rz,  cos_rz, 0],
-                            [     0,       0, 1]])
-
-        # compute the full rotation matrix
-        R_M = np.dot(np.dot(R_Mx, R_My), R_Mz)
-
+        get_RM(moved_vector)
         
     if vive_i == test_time2:
         print('starting to print real value')
-        print(vive_pose0)
-        print(vive_pose1)
         print(R_M)
 
     if vive_i > test_time2:
-        world_frame = np.around(np.matmul(R_M, np.array(vive_pose1)), decimals=3)
-        linear_vx.append(round(world_frame[0],3))
-        linear_vy.append(round(world_frame[1],3))
-        linear_vz.append(round(world_frame[2],3))
+        world_frame = transform_RM(vive_pose1)
+        linear_vx.append(world_frame[0])
+        linear_vy.append(world_frame[1])
+        linear_vz.append(world_frame[2])
 
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-from mpl_toolkits.mplot3d import Axes3D
+def get_RM(vector):
+    global R_M
+    angle = angle_between(vector, np.array([1,0,0]))
+    R_My, now = rotate_y(vector, angle)
+    angle = angle_between(now, np.array([0,0,1]))
+    R_Mz, now = rotate_z(now, angle)
+    angle = angle_between(now, np.array([0,1,0]))
+    R_Mx, now = rotate_x(now, angle)
+
+    R_M = np.dot(R_Mz, R_My)
+    R_M = np.dot(R_Mx, R_M)
+
+def transform_RM(vector):
+    return np.dot(R_M, vector)
 
 def angle_between(v1, v2):
     # angle between two vectors in radians
@@ -105,6 +87,51 @@ def angle_between(v1, v2):
     unit_vector_2 = v2 / np.linalg.norm(v2)
     dot_product = np.dot(unit_vector_1, unit_vector_2)
     return np.arccos(dot_product)
+
+def plot_vector(vector, color):
+    ax.plot3D([0,vector[0]], [0,vector[1]], [0,vector[2]], color)
+
+def rotate_x(vector, angle):
+
+    theta_rx = angle
+    sin_rx, cos_rx = np.sin(theta_rx), np.cos(theta_rx)
+
+    # get the rotation matrix on x axis
+    R_Mx = np.array([[1,      0,       0],
+                    [0, cos_rx, -sin_rx],
+                    [0, sin_rx,  cos_rx]])
+
+    after = np.dot(R_Mx,vector)
+    # plot_vector(after, 'lightcoral')
+    return R_Mx, after
+
+def rotate_y(vector, angle):
+
+    theta_rx = angle
+    sin_ry, cos_ry = np.sin(theta_rx), np.cos(theta_rx)
+
+    # get the rotation matrix on y axis
+    R_My = np.array([[cos_ry, 0, -sin_ry],
+                        [     0, 1,       0],
+                        [sin_ry, 0,  cos_ry]])
+
+    after = np.dot(R_My,vector)
+    # plot_vector(after, 'cyan')
+    return R_My, after
+
+def rotate_z(vector, angle):
+
+    theta_rx = angle
+    sin_rz, cos_rz = np.sin(theta_rx), np.cos(theta_rx)
+
+    # get the rotation matrix on z axis
+    R_Mz = np.array([[cos_rz, sin_rz, 0],
+                        [-sin_rz,  cos_rz, 0],
+                        [     0,       0, 1]])
+
+    after = np.dot(R_Mz,vector)
+    # plot_vector(after, 'lime')
+    return R_Mz, after
 
 def animate(i):
     ax.clear()

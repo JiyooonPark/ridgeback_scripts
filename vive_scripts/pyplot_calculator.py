@@ -7,7 +7,6 @@ from mpl_toolkits.mplot3d import Axes3D
 graph_limit = 3
 
 pose0, pose1, pose2 = np.array([ 1.49971449, -0.31798303, -0.29524547]),np.array([ 1.03813982, -0.32580185, -0.50409508]), np.array([ 1.25342631, -0.32641697, -0.98949438])
-T_M = []
 R_M = []
 
 v0 = pose1 - pose0
@@ -16,26 +15,6 @@ v1 = pose2 - pose1
 v0 = v0 / np.linalg.norm(v0)
 v1 = v1 / np.linalg.norm(v1)
 v2 = np.cross(v0, v1.T)
-
-def print_results():
-
-    global R_M, T_M
-    print(f'pose0: {pose0}, pose1: {pose1}, pose2: {pose2}')
-    v0 = pose1 - pose0
-    v1 = pose2 - pose1
-    v2 = np.cross(v1, v0)
-    print(f'v0: {v0}, v1: {v1}, v2: {v2}')
-
-    v0_hat = v0 / np.linalg.norm(v0)
-    v1_hat = v1 / np.linalg.norm(v1)
-    v2_hat = v2 / np.linalg.norm(v2)
-
-    ax.plot3D([0, v0_hat[0]], [0, v0_hat[1]], [0, v0_hat[2]], 'red')
-    ax.plot3D([0, v1_hat[0]], [0, v1_hat[1]], [0, v1_hat[2]], 'blue')
-    ax.plot3D([0, v2_hat[0]], [0, v2_hat[1]], [0, v2_hat[2]], 'green')
-
-    print(f'======\nunit vector: \nv0: {v0_hat}\nv1: {v1_hat}\nv2: {v2_hat}')
-    T_M = np.array([v0_hat, v1_hat, v2_hat])
 
 def angle_between(v1, v2):
     # angle between two vectors in radians
@@ -59,7 +38,7 @@ def rotate_x(vector, angle):
 
     after = np.dot(R_Mx,vector)
     # plot_vector(after, 'lightcoral')
-    return after
+    return R_Mx, after
 
 def rotate_y(vector, angle):
 
@@ -73,7 +52,7 @@ def rotate_y(vector, angle):
 
     after = np.dot(R_My,vector)
     # plot_vector(after, 'cyan')
-    return after
+    return R_My, after
 
 def rotate_z(vector, angle):
 
@@ -86,9 +65,8 @@ def rotate_z(vector, angle):
                         [     0,       0, 1]])
 
     after = np.dot(R_Mz,vector)
-    # print(after)
     # plot_vector(after, 'lime')
-    return after
+    return R_Mz, after
 
 if __name__=='__main__':
 
@@ -112,17 +90,19 @@ if __name__=='__main__':
     print('v2:', v2)
 
     final_vector = []
-    for i in [v1, v2]:
-        angle = angle_between(i, np.array([1,0,0]))
-        now = rotate_y(i, angle)
-        angle = angle_between(now, np.array([0,0,1]))
-        now = rotate_z(now, angle)
-        angle = angle_between(now, np.array([0,1,0]))
-        now = rotate_x(now, angle)
-        final_vector.append(now)
+    # for i in [v1, v2]:
+    angle = angle_between(v1, np.array([1,0,0]))
+    R_My, now = rotate_y(v1, angle)
+    angle = angle_between(now, np.array([0,0,1]))
+    R_Mz, now = rotate_z(now, angle)
+    angle = angle_between(now, np.array([0,1,0]))
+    R_Mx, now = rotate_x(now, angle)
 
-    print(final_vector)
-    plot_vector(np.cross(final_vector[0], final_vector[1]), 'lime')
+    R_M = np.dot(R_Mz, R_My)
+    R_M = np.dot(R_Mx, R_M)
+
+    for i in [v0, v1, v2]:
+        final_vector.append(np.dot(R_M, i))
         
     for i in final_vector:
         plot_vector(i, 'pink')
