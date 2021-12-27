@@ -3,6 +3,7 @@ import numpy as np
 import time
 from trajectory_planning import *
 import rospy
+from nav_msgs.msg import Odometry
 
 class Iidgeback:
     def __init__(self, id, rx, ry, wall, radius=0.622):
@@ -275,10 +276,10 @@ def generate_interval(wall, count=4):
 
 if __name__ == "__main__":
 
-    # Communication #3 : farmost drawing point
-    ir_sub = rospy.Subscriber('/iiwa_ridgeback_communicaiton', Odometry, get_communication)
+    # ir_sub = rospy.Subscriber('/iiwa_ridgeback_communicaiton', Odometry, get_communication)
+    rospy.init_node('trajectory_node')
 
-    file_name = 'smooth_curve10'
+    file_name = 'smooth_curve4'
     input_wall = open_file(file_name, 'obj')
     print(f'Opened file {file_name}')
     x_wall, y_wall = plot_wall_draw(input_wall)
@@ -302,30 +303,47 @@ if __name__ == "__main__":
 
     # Communication # 3 : position list
 
-    from geometry_msgs.msg import PoseArray, Pose, Quaternion
-    ir_pub = rospy.Publisher('/iiwa_ridgeback_communicaiton/trajectory', PoseArray, queue_size=10)
+    from geometry_msgs.msg import PoseArray, Point, Quaternion, Pose
+    import std_msgs.msg
+
+    ir_pub = rospy.Publisher('/iiwa_ridgeback_communicaiton/trajectory', PoseArray, queue_size=1000)
     message= PoseArray()
     pose_list = []
-    p = Pose()
-    q = Quaternion()
+    
+    for i in range(len(path_x)):
+        p = Point()
+        q = Quaternion()
+        pose = Pose()
 
-    for i in len(path_x):
         p.x = path_x[i]
         p.y = path_y[i]
 
-        q = Quaternion()
         if path_angle[i][0] == 'l':
             q.x = -float(path_angle[i][2:])
         else:
             q.x = float(path_angle[i][2:])
 
-        p.orientation = q
-        pose_list.append(p)
-        
+        pose.position = p
+        pose.orientation = q
+
+        pose_list.append(pose)
+
+    h = std_msgs.msg.Header()
+    h.stamp = rospy.Time.now()
+    message.header = h
+
     message.poses = pose_list
-    ir_pub.publish(message)
+
+    rate = rospy.Rate(10) 
+
+    while not rospy.is_shutdown():
+        ir_pub.publish(message)
+        rate.sleep()
+
     # 그리는 부분
     plt.plot(x, y, color="grey")
     plt.grid(True)
     plt.gca().set_aspect('equal', adjustable='box')
     plt.show()
+
+    rospy.spin()
