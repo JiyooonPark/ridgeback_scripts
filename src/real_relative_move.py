@@ -28,7 +28,7 @@ def move_relative(x, y, duration=5):
 if __name__ == "__main__":
 
     # goal x,y : the final goal
-    x_goal = 2
+    x_goal = -1
     y_goal = 0
 
     try:

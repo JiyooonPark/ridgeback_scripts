@@ -15,6 +15,7 @@ vive_i, i = 0, 0
 vive_pose0, vive_pose1, vive_pose2 = [], [], []
 transform_vector = 0
 R_M  = []
+world_frame = [2, 3, 1]
 
 linear_x, linear_y, linear_z= [],[],[]
 linear_vx, linear_vy, linear_vz= [],[],[]
@@ -25,7 +26,7 @@ test_time0, test_time1, test_time2 = 10, 50, 300
 
 def get_current_position(msg):
 
-    global linear_x, linear_y, linear_z, i
+    global linear_x, linear_y, linear_z, i, world_frame
 
     pose_position = msg.pose.pose.position
     position_x = pose_position.x

@@ -5,9 +5,6 @@ from geometry_msgs.msg import PoseWithCovarianceStamped
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.animation as animation
 import time
 
 # ============= VARIABLES ============== #
@@ -18,7 +15,7 @@ vive_i, i = 0, 0
 vive_pose0, vive_pose1, vive_pose2 = [], [], []
 transform_vector = 0
 R_M  = []
-world_frame = []
+world_frame = [2, 3, 1]
 
 linear_x, linear_y, linear_z= [],[],[]
 linear_vx, linear_vy, linear_vz= [],[],[]
@@ -49,7 +46,6 @@ def get_current_position(msg):
     vive_i+=1
 
     if vive_i<=test_time0:
-        print('init pose')
         vive_pose0 = [position_x, position_y, position_z]
         vive_pose1 = [position_x, position_y, position_z]
 
@@ -59,9 +55,7 @@ def get_current_position(msg):
     if test_time0 == vive_i:
         move_relative(0, 0.4)
     if test_time1<vive_i<test_time2:
-        print('move right')
         moved_vector = np.array(vive_pose1)- np.array(vive_pose0)
-
         get_RM(moved_vector)
         
     if vive_i == test_time2:
@@ -73,9 +67,7 @@ def get_current_position(msg):
         linear_vx.append(world_frame[0])
         linear_vy.append(world_frame[1])
         linear_vz.append(world_frame[2])
-        odom_msgs = Odometry()
-        odom_msgs.pose.pose.position.x = world_frame[0]
-        odom_msgs.pose.pose.position.y = world_frame[1]
+ 
 
 
 def move_relative(x, y, duration=5):
@@ -95,7 +87,6 @@ def move_relative(x, y, duration=5):
 
 
 def get_RM(vector):
-    
     global R_M
     angle = angle_between(vector, np.array([1,0,0]))
     R_My, now = rotate_y(vector, angle)
@@ -103,13 +94,6 @@ def get_RM(vector):
     R_Mz, now = rotate_z(now, angle)
     angle = angle_between(now, np.array([0,0,1]))
     R_Mx, now = rotate_x(now, angle)
-
-    # angle = angle_between(vector, np.array([0,0,1]))
-    # R_Mx, now = rotate_y(vector, angle)
-    # angle = angle_between(now, np.array([1,0,0]))
-    # R_My, now = rotate_z(now, angle)
-    # angle = angle_between(now, np.array([0,1,0]))
-    # R_Mz, now = rotate_x(now, angle)
 
     R_M = np.dot(R_Mz, R_My)
     R_M = np.dot(R_Mx, R_M)
@@ -123,9 +107,6 @@ def angle_between(v1, v2):
     unit_vector_2 = v2 / np.linalg.norm(v2)
     dot_product = np.dot(unit_vector_1, unit_vector_2)
     return np.arccos(dot_product)
-
-def plot_vector(vector, color):
-    ax.plot3D([0,vector[0]], [0,vector[1]], [0,vector[2]], color)
 
 def rotate_x(vector, angle):
 
@@ -169,30 +150,18 @@ def rotate_z(vector, angle):
     # plot_vector(after, 'lime')
     return R_Mz, after
 
-def animate(i):
-    ax.clear()
-    ax.set_xlim(-graph_limit, graph_limit)
-    ax.set_ylim(-graph_limit, graph_limit)
-    ax.set_zlim(-graph_limit, graph_limit)
-
-    ax.set_xlabel('X axis')
-    ax.set_ylabel('Y axis')
-    ax.set_zlabel('Z axis')
-
-    ax.set_title('Tracker Pose')
-
-    ax.plot3D(linear_x, linear_y, linear_z, color='r')
-    ax.plot3D(linear_vx, linear_vy, linear_vz, color='b')
-
 if __name__=='__main__':
 
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-
-    rospy.init_node('print_tracker_pose')
+    rospy.init_node('print_tracker_pose_publish')
     odom_sub = rospy.Subscriber('/vive/LHR_2FCD60B0_pose', PoseWithCovarianceStamped, get_current_position)
     odom_pub = rospy.Publisher('/vive_pose/filtered', Odometry, queue_size=1)
 
-    ani = animation.FuncAnimation(fig, animate, interval=10)
+    rate = rospy.Rate(10) 
 
-    plt.show()
+    while not rospy.is_shutdown():
+        odom_msgs = Odometry()
+        odom_msgs.pose.pose.position.x = world_frame[0]
+        odom_msgs.pose.pose.position.y = world_frame[2]
+        odom_pub.publish(odom_msgs)
+        rate.sleep()
+    rospy.spin()
