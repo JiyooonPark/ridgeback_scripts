@@ -302,22 +302,24 @@ def to_iiwa_range(min_x_list, max_x_list):
     print(to_iiwa)
     return to_iiwa
 
-def re_set_length(img_name):
-    import os
-    # import cv2
-
-    cwd = os.getcwd()  # Get the current working directory (cwd)
-    im = cv2.imread(cwd[:-3]+'/img/' + img_name)
-    shape = im.shape
-    # (225, 400, 3)
-    # how are we going to decide the size?
+def re_set_length(x_wall, y_wall):
+    img_size = 2/2 # m
+    center = (min(x_wall)+max(x_wall))/2
+    x_wall_limit, y_wall_limit = [], []
+    for i in range(len(x_wall)):
+        if center-img_size<x_wall[i]<center+img_size:
+            x_wall_limit.append(x_wall[i])
+            y_wall_limit.append(y_wall[i])
+    print(f'{min(x_wall)}, {max(x_wall)}')
+    print(f'center: {center}, from: {center-img_size}, to: {center+img_size}')
+    return x_wall_limit, y_wall_limit
 
 def run_algorithm(file_name = 'wood_bee_hive_three'):
     
     input_wall = open_file(file_name, 'obj')
     # print(f'Opened file {file_name}')
     x_wall, y_wall = plot_wall_draw(input_wall)
-    # x_wall, y_wall = re_set_length(img_name)
+    x_wall, y_wall = re_set_length(x_wall, y_wall)
 
     x = generate_interval(x_wall)
     y = generate_interval(y_wall)
