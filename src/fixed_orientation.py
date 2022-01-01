@@ -31,7 +31,7 @@ if __name__=='__main__':
 
     rospy.init_node('fixed_orientation')
 
-    sub = rospy.Subscriber ('/odom', Odometry, get_rotation)
+    sub = rospy.Subscriber ('/odometry/filtered', Odometry, get_rotation)
     pub = rospy.Publisher('cmd_vel', Twist, queue_size=1)
 
     r = rospy.Rate(10)

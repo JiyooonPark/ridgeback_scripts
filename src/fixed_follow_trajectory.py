@@ -2,15 +2,13 @@
 
 import math
 import rospy
-import time
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
-from scipy import interpolate
 
 global x, y, w
-x = 0
-y = 0
-w = 0
+x = 1
+y = 1
+w = 1
 
 def get_current_position(msg):
     global x, y, w
@@ -19,12 +17,14 @@ def get_current_position(msg):
     w = msg.pose.pose.orientation.w
 
 def go_to_goal(x_goal, y_goal):
+
     velocity_message = Twist()
     cmd_vel_topic = '/cmd_vel'
     velocity_publisher = rospy.Publisher(cmd_vel_topic, Twist, queue_size=10)
     print('start moving to ', x_goal, y_goal)
     i = 0
     while (True):
+
         i = i + 1
 
         K_linear = 0.05
@@ -38,11 +38,11 @@ def go_to_goal(x_goal, y_goal):
 
         velocity_publisher.publish(velocity_message)
 
-        if i % 1000 == 0:
+        if i % 100000 == 0:
             print(
                 f'CUR: x: {round(x, 2)} y: {round(y, 2)} distance: {round(distance, 2)} x_dist: {round(x_dist, 2)} y_dist: {round(y_dist, 2)}')
 
-        if (distance < 0.1):
+        if (distance < 0.01):
             print('done')
             break
 
@@ -62,8 +62,8 @@ if __name__ == '__main__':
         odom_sub = rospy.Subscriber('/odometry/filtered', Odometry, get_current_position)
         rospy.sleep(0.5)
 
-        x_positive = [0, 1, 4, -1]
-        y_positive = [0, -2, 3, 1]
+        x_positive = [7, 8] #[0, 1, 4, 6]
+        y_positive = [1, 0] # [0, -2, 2, 4]
 
         path = zip(x_positive, y_positive)
 
