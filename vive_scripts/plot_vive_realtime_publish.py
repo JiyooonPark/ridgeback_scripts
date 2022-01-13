@@ -153,9 +153,10 @@ def rotate_z(vector, angle):
 if __name__=='__main__':
 
     rospy.init_node('print_tracker_pose_publish')
-    odom_sub = rospy.Subscriber('/vive/LHR_2FCD60B0_pose', PoseWithCovarianceStamped, get_current_position)
+    # tracker_name = '0B028308'
+    tracker_name = '515D3307'
+    odom_sub = rospy.Subscriber('/vive/LHR_'+tracker_name+'_pose', PoseWithCovarianceStamped, get_current_position)
     odom_pub = rospy.Publisher('/vive_pose/filtered', Odometry, queue_size=1)
-
     rate = rospy.Rate(10) 
 
     while not rospy.is_shutdown():
@@ -163,5 +164,6 @@ if __name__=='__main__':
         odom_msgs.pose.pose.position.x = world_frame[0]
         odom_msgs.pose.pose.position.y = world_frame[2]
         odom_pub.publish(odom_msgs)
+        print(f'x: {world_frame[0]}, y:{world_frame[2]}')
         rate.sleep()
     rospy.spin()

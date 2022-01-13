@@ -26,7 +26,7 @@ test_time0, test_time1, test_time2 = 10, 50, 300
 
 def get_current_position(msg):
 
-    global linear_x, linear_y, linear_z, i, world_frame
+    global linear_x, linear_y, linear_z, i
 
     pose_position = msg.pose.pose.position
     position_x = pose_position.x

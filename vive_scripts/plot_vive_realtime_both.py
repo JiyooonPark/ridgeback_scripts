@@ -21,6 +21,7 @@ class Tracker:
         self.i = 0
         self.transform_vector = []
         self.R_M = None
+        self.vive_orientation = []
         
     def get_RM(self, vector):
     
@@ -101,9 +102,10 @@ class Ridgeback:
 
     def __init__(self):
         self.tracker_name = '515D3307'
-        self.publisher_cmd_vel = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+        # self.publisher_cmd_vel = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
         self.publisher_pose = rospy.Publisher('/vive_pose/filtered', Odometry, queue_size=1)
         self.subscriber_vive = rospy.Subscriber('/vive/LHR_'+self.tracker_name+'_pose', PoseWithCovarianceStamped, self.get_current_position)
+        
         self.linear_speed = 0.1
         self.reached = False
         self.i = 0
@@ -118,6 +120,12 @@ class Ridgeback:
         position_x = pose_position.x
         position_y = pose_position.y
         position_z = pose_position.z
+
+        pose_orientation = msg.pose.pose.orientation
+        orientation_x = pose_orientation.x
+        orientation_y = pose_orientation.y
+        orientation_z = pose_orientation.z
+        self.tracker.vive_orientation = [orientation_x, orientation_y, orientation_z]
 
         self.i += 1
 
@@ -137,8 +145,8 @@ class Ridgeback:
         self.tracker.vive_pose1 = [position_x, position_y, position_z]
         
         if self.timestamps['step0'] == self.tracker.i:
-            self.move_relative(0, -0.4)
-            # rospy.sleep(10)
+            # self.move_relative(0, -0.4)
+            rospy.sleep(10)
 
         if self.timestamps['step1']<self.tracker.i<self.timestamps['step2']:
             print('move right')
@@ -152,20 +160,36 @@ class Ridgeback:
 
         if self.tracker.i > self.timestamps['step2']:
             world_frame = self.tracker.transform_RM(self.tracker.vive_pose1)
+            world_frame_or = self.tracker.transform_RM(self.tracker.vive_orientation)
             self.linear_vz.append(world_frame[0])
             self.linear_vy.append(world_frame[1])
             self.linear_vx.append(world_frame[2])
-            odom_msgs = Odometry()
-            odom_msgs.pose.pose.position.x = world_frame[0]
-            odom_msgs.pose.pose.position.y = world_frame[1]
 
+            odom_msgs = Odometry()
+            odom_msgs.pose.pose.position.x = world_frame[2]
+            odom_msgs.pose.pose.position.y = world_frame[1]
+            odom_msgs.pose.pose.position.z = world_frame[0]
+
+            odom_msgs.pose.pose.orientation.x = world_frame_or[2]
+            odom_msgs.pose.pose.orientation.y = world_frame_or[1]
+            odom_msgs.pose.pose.orientation.z = world_frame_or[0]
+
+            self.publisher_pose.publish(odom_msgs)
+
+            print(f'x: {round(world_frame[2],3)}, y:{round(world_frame[1],3)}')
+
+    def check_speed(self, speed):
+        if speed >= 0.03:
+            return 0.03
+        else:
+            return speed
 
     def move_relative(self, x, y, duration=5):
         print("moving to :", x, y)
 
         cmd = Twist()
-        cmd.linear.x = x/duration
-        cmd.linear.y = y/duration
+        cmd.linear.x = self.check_speed(x/duration)
+        cmd.linear.y = self.check_speed(y/duration)
         cmd.linear.z = 0
 
         rospy.sleep(1)

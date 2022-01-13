@@ -13,7 +13,7 @@ class MoveOdom (object):
     def __init__(self):
         # Target direction and distance in 2D referenced to CURRENT postition
         self.linear_speed = 0.01 #0.01 # 1 m/s
-        self.direction = np.array([0, 1]) # (0, -1) is moving left
+        self.direction = np.array([-1, 0]) # (0, -1) is moving left
         self.target_dist = 0.1 # in meter
         self.target_position = self.direction * self.target_dist
 
@@ -62,18 +62,19 @@ class MoveOdom (object):
         print(dist)
         # if (iiwa_done):
         if dist > 0.001:
-            self.move.linear.x = self.linear_speed * self.direction[0]
-            self.move.linear.y = self.linear_speed * self.direction[1]
+            self.move.linear.x = self.linear_speed * self.move_next[0]
+            self.move.linear.y = self.linear_speed * self.move_next[1]
 
-        if dist < 0.01:
+        if dist < 0.001:
             print("REACHED!!")
             self.move.linear.x = 0
             self.move.linear.y = 0
-            #self.reached = True
+            self.reached = True
             # Get the inital position. This will be a reference point for calculating
             # the distance moved
-
-        self.move_pub.publish(self.move)
+            time.sleep(10)
+        if not self.reached :
+            self.move_pub.publish(self.move)
 
     def calculate_distance(self, target_position, new_position):
         """Calculate the distance between two Points (positions)."""
@@ -82,8 +83,17 @@ class MoveOdom (object):
         y2 = new_position.y
         y1 = target_position[1]
         dist = math.hypot(x2 - x1, y2 - y1)
-        print(f'current pose: {x2, y2}\ntarget pose:{x1, y1}')
+        x = x1-x2
+        y = y1-y2
+        self.move_next = unit_vector([x,y])
+        print(f'current pose: {x2, y2}\ntarget pose:{x1, y1} \nmove next: {self.move_next}')
         return dist
+import numpy as np
+
+def unit_vector(vector):
+    vector=np.array(vector)
+    unit_vector = vector / (vector**2).sum()**0.5
+    return unit_vector
 
 if __name__ == '__main__':
     # create a node for running the program
