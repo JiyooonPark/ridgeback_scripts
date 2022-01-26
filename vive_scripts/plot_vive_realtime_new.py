@@ -83,6 +83,8 @@ class Ridgeback:
         self.linear_vx, self.linear_vy, self.linear_vz = [],[],[]
         self.timestamps={'step0':10, 'step1':50, 'step2':100}
 
+        self.x, self.y, self.z = [],[],[]
+
 
     def get_current_position(self,msg):
 
@@ -111,18 +113,20 @@ class Ridgeback:
             print('DONE MOVING 1ST')
             self.move_relative(0, 0.2)
 
+        if self.timestamps['step0']+1 == self.tracker.i:
             self.tracker.pose_list['1'] = [self.tracker.pose, self.tracker.orientation]
             print('DONE MOVING 2ND')
             self.move_relative(-0.2, 0)
-
+        if self.timestamps['step0']+2 == self.tracker.i:
             self.tracker.pose_list['2'] = [self.tracker.pose, self.tracker.orientation]
             print('DONE MOVING')
             rospy.sleep(2)
-            print(self.tracker.pose_list)
+            # print(self.tracker.pose_list)
         
         elif self.tracker.i > self.timestamps['step0']:
 
             R_q = self.tracker.quaternion_rotation_matrix()
+            # print(f'R_q: {R_q}')
             # print(self.tracker.pose_list['1'])
 
             x_b_hat = np.subtract(np.array(self.tracker.pose_list['1'][0]), np.array(self.tracker.pose_list['0'][0]))
@@ -135,11 +139,14 @@ class Ridgeback:
             
             x_a_hat, y_a_hat , z_a_hat = [1,0,0], [0,1,0], [0,0,1]
 
+
+            # print(f'x_b_hat: {x_b_hat}\nx_a_hat: {x_a_hat}\ncalculation: {np.dot(x_b_hat, x_a_hat)}')
             self.R_ba = np.array([
                 [np.dot(x_b_hat, x_a_hat), np.dot(y_b_hat, x_a_hat), np.dot(z_b_hat, x_a_hat)],
                 [np.dot(x_b_hat, y_a_hat), np.dot(y_b_hat, y_a_hat), np.dot(z_b_hat, y_a_hat)],
                 [np.dot(x_b_hat, z_a_hat), np.dot(y_b_hat, z_a_hat), np.dot(z_b_hat, z_a_hat)]
             ])
+            # print(f'rotation matrix self.R_ba: {self.R_ba}')
 
 
             # angle = 2*math.acos(self.tracker.orientation[0])
@@ -147,16 +154,19 @@ class Ridgeback:
             y = self.tracker.orientation[2]/math.sqrt(1-self.tracker.orientation[0]**2)
             z = self.tracker.orientation[3]/math.sqrt(1-self.tracker.orientation[0]**2)
 
-            print(f'axis = x: {x} / y: {y} / z: {z}')
+            self.x.append(x)
+            self.y.append(y)
+            self.z.append(z)
+
+            # print(f'axis = x: {x} / y: {y} / z: {z}')
 
             orientation = np.dot(R_q, [x,y,z])
 
             world_frame = np.dot(R_q, self.tracker.pose)
-            print(f'world frame: {world_frame}')
-            world_frame = np.dot(self.R_ba, world_frame)
-
             
-
+            # world_frame = np.dot(self.R_ba, world_frame)
+            print(f'world frame: {world_frame}')
+            
             # pose = np.dot(self.R_ba, self.tracker.pose)
 
         if self.tracker.i > self.timestamps['step2']:
@@ -175,7 +185,7 @@ class Ridgeback:
 
             self.publisher_pose.publish(odom_msgs)
 
-            print(f'x: {round(world_frame[2],3)}, y:{round(world_frame[1],3)}')
+            # print(f'x: {round(world_frame[2],3)}, y:{round(world_frame[1],3)}')
 
     def check_speed(self, speed):
         if speed >= 0.03:
@@ -213,6 +223,7 @@ class Ridgeback:
 
         ax.plot3D(self.linear_x, self.linear_y, self.linear_z, color='r')
         ax.plot3D(self.linear_vx, self.linear_vy, self.linear_vz, color='b')
+        ax.plot3D(self.x, self.y, self.z, color='c')
 
     def start(self):
         ani = animation.FuncAnimation(fig, self.animate, interval=10)
