@@ -72,7 +72,7 @@ class Ridgeback:
 
     def __init__(self):
         self.tracker_name = '515D3307'
-        # self.publisher_cmd_vel = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+        self.publisher_cmd_vel = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
         self.publisher_pose = rospy.Publisher('/vive_pose/filtered', Odometry, queue_size=1)
         self.subscriber_vive = rospy.Subscriber('/vive/LHR_'+self.tracker_name+'_pose', PoseWithCovarianceStamped, self.get_current_position)
         
@@ -101,49 +101,63 @@ class Ridgeback:
         self.tracker.orientation = [orientation_w, orientation_x, orientation_y, orientation_z]
 
         self.tracker.i+=1
-        
+
+        self.linear_x.append(round(position_x,3))
+        self.linear_y.append(round(position_y,3))
+        self.linear_z.append(round(position_z,3))
+
         if self.timestamps['step0'] == self.tracker.i:
             self.tracker.pose_list['0'] = [self.tracker.pose, self.tracker.orientation]
             print('DONE MOVING 1ST')
-            self.move_relative(0, -0.3)
+            self.move_relative(0, 0.2)
 
             self.tracker.pose_list['1'] = [self.tracker.pose, self.tracker.orientation]
             print('DONE MOVING 2ND')
-            self.move_relative(0.3, 0)
+            self.move_relative(-0.2, 0)
 
             self.tracker.pose_list['2'] = [self.tracker.pose, self.tracker.orientation]
             print('DONE MOVING')
-            rospy.sleep(10)
+            rospy.sleep(2)
+            print(self.tracker.pose_list)
         
-        R_q = self.tracker.quaternion_rotation_matrix()
+        elif self.tracker.i > self.timestamps['step0']:
 
-        x_b_hat = np.array(self.tracker.pose_list['1'])- np.array(self.tracker.pose_list['0'])
-        y_b_hat = np.array(self.tracker.pose_list['2'])- np.array(self.tracker.pose_list['1'])
-        z_b_hat = np.cross(x_b_hat, y_b_hat)
-        
-        x_b_hat = np.dot(R_q, x_b_hat)
-        y_b_hat = np.dot(R_q, y_b_hat)
-        z_b_hat = np.dot(R_q, z_b_hat)
-        
-        x_a_hat, y_a_hat , z_a_hat = [1,0,0], [0,1,0], [0,0,1]
+            R_q = self.tracker.quaternion_rotation_matrix()
+            # print(self.tracker.pose_list['1'])
 
-        self.R_ba = np.array([
-            [np.dot(x_b_hat, x_a_hat), np.dot(y_b_hat, x_a_hat), np.dot(z_b_hat, x_a_hat)],
-            [np.dot(x_b_hat, y_a_hat), np.dot(y_b_hat, y_a_hat), np.dot(z_b_hat, y_a_hat)],
-            [np.dot(x_b_hat, z_a_hat), np.dot(y_b_hat, z_a_hat), np.dot(z_b_hat, z_a_hat)]
-        ])
+            x_b_hat = np.subtract(np.array(self.tracker.pose_list['1'][0]), np.array(self.tracker.pose_list['0'][0]))
+            y_b_hat = np.subtract(np.array(self.tracker.pose_list['2'][0]), np.array(self.tracker.pose_list['1'][0]))
+            z_b_hat = np.cross(x_b_hat, y_b_hat)
+            
+            x_b_hat = np.dot(R_q, x_b_hat)
+            y_b_hat = np.dot(R_q, y_b_hat)
+            z_b_hat = np.dot(R_q, z_b_hat)
+            
+            x_a_hat, y_a_hat , z_a_hat = [1,0,0], [0,1,0], [0,0,1]
 
-        # angle = 2*math.acos(self.tracker.orientation[0])
-        x = self.tracker.orientation[1]/math.sqrt(1-self.tracker.orientation[0]**2)
-        y = self.tracker.orientation[2]/math.sqrt(1-self.tracker.orientation[0]**2)
-        z = self.tracker.orientation[3]/math.sqrt(1-self.tracker.orientation[0]**2)
+            self.R_ba = np.array([
+                [np.dot(x_b_hat, x_a_hat), np.dot(y_b_hat, x_a_hat), np.dot(z_b_hat, x_a_hat)],
+                [np.dot(x_b_hat, y_a_hat), np.dot(y_b_hat, y_a_hat), np.dot(z_b_hat, y_a_hat)],
+                [np.dot(x_b_hat, z_a_hat), np.dot(y_b_hat, z_a_hat), np.dot(z_b_hat, z_a_hat)]
+            ])
 
-        orientation = np.dot(R_q, [x,y,z])
 
-        world_frame = np.dot(R_q, self.tracker.pose)
-        world_frame = np.dot(self.R_ba, world_frame)
+            # angle = 2*math.acos(self.tracker.orientation[0])
+            x = self.tracker.orientation[1]/math.sqrt(1-self.tracker.orientation[0]**2)
+            y = self.tracker.orientation[2]/math.sqrt(1-self.tracker.orientation[0]**2)
+            z = self.tracker.orientation[3]/math.sqrt(1-self.tracker.orientation[0]**2)
 
-        # pose = np.dot(self.R_ba, self.tracker.pose)
+            print(f'axis = x: {x} / y: {y} / z: {z}')
+
+            orientation = np.dot(R_q, [x,y,z])
+
+            world_frame = np.dot(R_q, self.tracker.pose)
+            print(f'world frame: {world_frame}')
+            world_frame = np.dot(self.R_ba, world_frame)
+
+            
+
+            # pose = np.dot(self.R_ba, self.tracker.pose)
 
         if self.tracker.i > self.timestamps['step2']:
             self.linear_vz.append(world_frame[0])
